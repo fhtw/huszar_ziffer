@@ -13,7 +13,7 @@ public class PluginManager {
 		for(int i = 0 ; i < plugins.length; i++){
 			if(plugins[i].equals(param)){
 				try {
-					Plugin plug = (Plugin)(Class.forName("Plugins." + param).newInstance());
+					Plugin plug = (Plugin)(Class.forName("plugins." + param).newInstance());
 					_pluginResponse = plug.execPlugin();
 					return _pluginResponse;
 				}
