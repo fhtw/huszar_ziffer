@@ -8,11 +8,10 @@ import java.net.Socket;
 public class HttpRequest implements Runnable {
 	
 	private Socket _socket;
-	private String _param = null;
 	private String[] _paramArray;
 
 	// Constructor
-    HttpRequest(Socket socket) //raus nicht nur exception immer betimmten fehler thrown
+    HttpRequest(Socket socket)
     {
             try {
             	this._socket = socket;
@@ -26,12 +25,13 @@ public class HttpRequest implements Runnable {
     public void run()
     {
     	try {
-    		processRequest();
-    		HttpResponse response = new HttpResponse(_socket, _paramArray);
-    		response.processResponse();    		
+    		processRequest();    		
+    		HttpResponse response = new HttpResponse(_socket, _paramArray);    		
+    		response.processResponse();
     	} 
     	catch (Exception e) {
     		System.err.println(e);
+    		e.printStackTrace(System.out);
     	}
     }
 
@@ -43,21 +43,20 @@ public class HttpRequest implements Runnable {
 			in = new BufferedReader(
 			        new InputStreamReader(_socket.getInputStream()));
 			
-			_param = in.readLine();
+			String param = in.readLine();
 	    	
-	    	if(_param.length() >= 15)
+	    	if(param.length() >= 15)
 	    	{
-	    	   	_param = _param.substring(5, (_param.length()-9));
-	    	   	_paramArray = _param.split("/");
+	    	   	param = param.substring(5, (param.length()-9));
+	    	   	_paramArray = param.split("/");
 	    	}else
 	    	{
+	    		_paramArray = new String[1];
 	    		_paramArray[0] = null;
-	    	}	    	
+	    	}
 		} 
     	catch (IOException e) {
     		System.err.println(e);
-		}
-    	
-    	
+		}    	
     }
 }

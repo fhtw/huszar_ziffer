@@ -27,36 +27,38 @@ public class Temperatur implements Plugin {
 		try {
 			statement = conn.createStatement();
 			String queryString;
-			if(param == null){
+			if(param == null) {
 				queryString = "use EmbeddedSensorCloud"
 					+ " "
-					+ "select * from TEMPERATURE "
+					+ "SELECT * FROM TEMPERATURE "
 					+ "ORDER BY MEASUREMENTNUMBER DESC";
 			}else{
-					int page = Integer.parseInt(param);
-					int topLimit = page * 15;
-					int bottomLimit = topLimit - 15;;
-					queryString = "use EmbeddedSensorCloud"
-							+ " "
-							+ "select * from TEMPERATURE "
-							+ "WHERE MEASUREMENTNUMBER <"+topLimit+" AND MEASUREMENTNUMBER >"+bottomLimit 
-							+ "ORDER BY MEASUREMENTNUMBER DESC";
+				int page = Integer.parseInt(param);
+				int topLimit = page * 15;
+				int bottomLimit = topLimit - 15;;
+				queryString = "use EmbeddedSensorCloud"
+						+ " "							
+						+ "SELECT * FROM TEMPERATURE "
+						+ "WHERE MEASUREMENTNUMBER <"+topLimit+" AND MEASUREMENTNUMBER >"+bottomLimit 
+						+ "ORDER BY MEASUREMENTNUMBER DESC";
 			}
 		    ResultSet rs = statement.executeQuery(queryString);
 		    
 		    while (rs.next() && rowCount < 14) {
 		    	measureTable += "<tr><td>"+rs.getString(1)+"</td><td>"
-		    			+rs.getString(2)+"</td><td>"+rs.getString(3)+"</td><td></tr>";
+		    			+rs.getString(2)+"</td><td>"
+		    			+rs.getString(3)+"</td><td></tr>";
 		    	rowCount++;
 		    }
-			}
+		}
 		catch (SQLException e) {
 			System.err.println(e);
 		}
 		catch(NumberFormatException e){
 			return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
 		}
-	    measureTable += "</table>";
+	    
+		measureTable += "</table>";
 		return measureTable;
 	}
 	

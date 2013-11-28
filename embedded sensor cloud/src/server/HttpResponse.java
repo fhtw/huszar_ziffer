@@ -14,17 +14,17 @@ public class HttpResponse {
 	private String crlf = "\r\n";
 	private String contentHtml = "Content-Type: text/html";
 	private String pathOfFrontpage = "./src/server/index.html";
-	private String[] _paramArray = null;
+	private String[] _paramArray;
 	private String _pluginResponse = null;
 	
-	HttpResponse(Socket s, String[] paramArray)//clientsocket and parameter are saved as private var.
+	HttpResponse(Socket s, String[] paramArray) //clientsocket and parameter are saved as private variable
 	{
 		_socket = s;
 		_paramArray = paramArray;
 	}
 	
-	public void processResponse()//write the index.html in PrintWriter
-    {												//and check Plugins
+	public void processResponse() //write the index.html in PrintWriter and check Plugins
+    {												
 		PluginManager myPluginManager = new PluginManager();
 		if(_paramArray[0] == null)
 		{
@@ -89,7 +89,7 @@ public class HttpResponse {
 		   		out.println("</div>");
 		   		out.println("</body>");
 		   		out.println("</html>");
-		   		out.flush();// printwriter is sent to browser
+		   		out.flush();// Printwriter is sent to browser
 	    		out.close();
 	    	} catch (FileNotFoundException e)
 	    	{
