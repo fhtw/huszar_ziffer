@@ -39,7 +39,7 @@ public class PluginManager {
 
 	public String listPlugins() {
 		String[] plugins = getFilesFromPath("./src/Plugins");
-		String htmlList = "<div id=\"plugin_navi\" style=\"border-bottom: 1px solid black;border-top: 1px solid black;\">" + 
+		String htmlList = "<div id=\"plugin_navi\" style=\"border-bottom: 1px solid black; border-top: 1px solid black; margin-bottom: 20px;\">" + 
 						"<ul style=\"list-style-type:: none; text-align: center;\">";
 		
 		for(int i = 0;i < plugins.length;i++){
