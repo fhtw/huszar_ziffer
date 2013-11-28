@@ -14,19 +14,19 @@ public class HttpResponse {
 	private String crlf = "\r\n";
 	private String contentHtml = "Content-Type: text/html";
 	private String pathOfFrontpage = "./src/server/index.html";
-	private String _param = null;
+	private String[] _paramArray = null;
 	private String _pluginResponse = null;
 	
-	HttpResponse(Socket s, String param)//clientsocket and parameter are saved as private var.
+	HttpResponse(Socket s, String[] paramArray)//clientsocket and parameter are saved as private var.
 	{
 		_socket = s;
-		_param = param;
+		_paramArray = paramArray;
 	}
 	
 	public void processResponse()//write the index.html in PrintWriter
     {												//and check Plugins
 		PluginManager myPluginManager = new PluginManager();
-		if(_param == null)
+		if(_paramArray[0] == null)
 		{
 			String buffer;	    		
 			PrintWriter out;
@@ -82,7 +82,7 @@ public class HttpResponse {
     				}
 	    			br.close();
 	    		}
-	    		_pluginResponse = myPluginManager.execPlugin(_param);
+	    		_pluginResponse = myPluginManager.execPlugin(_paramArray);
 		   		//give parameter to Pluginmanager and write response String into Printwriter
 		   		out.println(myPluginManager.listPlugins());
 		   		out.println(_pluginResponse);

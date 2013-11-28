@@ -7,14 +7,19 @@ public class PluginManager {
 	private String _pluginResponse = null; // will be written in a <p> in the
 											// html file
 
-	public String execPlugin(String param) {
+	public String execPlugin(String[] paramArray) {
 		String[] plugins = getFilesFromPath("./src/Plugins");
 		
+		
 		for(int i = 0 ; i < plugins.length; i++){
-			if(plugins[i].equals(param)){
+			if(plugins[i].equals(paramArray[0])){
 				try {
-					Plugin plug = (Plugin)(Class.forName("plugins." + param).newInstance());
-					_pluginResponse = plug.execPlugin();
+					Plugin plug = (Plugin)(Class.forName("plugins." + paramArray[0]).newInstance());
+					if(paramArray.length < 2){
+						_pluginResponse = plug.execPlugin(null);
+					}else{
+						_pluginResponse = plug.execPlugin(paramArray[1]);
+					}
 					return _pluginResponse;
 				}
 				catch(InstantiationException e){

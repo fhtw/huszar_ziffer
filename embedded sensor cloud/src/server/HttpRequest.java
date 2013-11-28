@@ -9,6 +9,7 @@ public class HttpRequest implements Runnable {
 	
 	private Socket _socket;
 	private String _param = null;
+	private String[] _paramArray;
 
 	// Constructor
     HttpRequest(Socket socket) //raus nicht nur exception immer betimmten fehler thrown
@@ -26,7 +27,7 @@ public class HttpRequest implements Runnable {
     {
     	try {
     		processRequest();
-    		HttpResponse response = new HttpResponse(_socket, _param);
+    		HttpResponse response = new HttpResponse(_socket, _paramArray);
     		response.processResponse();    		
     	} 
     	catch (Exception e) {
@@ -47,9 +48,10 @@ public class HttpRequest implements Runnable {
 	    	if(_param.length() >= 15)
 	    	{
 	    	   	_param = _param.substring(5, (_param.length()-9));
+	    	   	_paramArray = _param.split("/");
 	    	}else
 	    	{
-	    		_param = null;
+	    		_paramArray[0] = null;
 	    	}	    	
 		} 
     	catch (IOException e) {

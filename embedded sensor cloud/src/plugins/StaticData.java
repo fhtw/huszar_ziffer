@@ -7,13 +7,9 @@ import java.io.IOException;
 import server.Plugin;
 
 public class StaticData implements Plugin {
-	
-	public StaticData() {
-		execPlugin();
-	}
 
 	@Override
-	public String execPlugin() {
+	public String execPlugin(String param) {
 		String response = "", buffer;
 		
 		try {

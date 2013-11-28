@@ -2,5 +2,5 @@ package server;
 
 public interface Plugin {
 	
-	public String execPlugin();// what the plugin should do
+	public String execPlugin(String param);// what the plugin should do
 }
