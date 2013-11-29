@@ -17,44 +17,67 @@ public class Temperatur implements Plugin {
 	}
 	
 	private String readFromDatabase(String param) {			
-		int rowCount = 0;
-		String measureTable = "<p style=\"text-align:center;\">"	
-				+ tableNavigation(param)
-				+ "</p>";
-		
-		measureTable += "<table style=\"margin:auto; border-bottom: 1px solid black; border-top: 1px solid black;\">" 
-					+ "<colgroup><col width=\"40\"><col width=\"80\"><col width=\"140\"> </colgroup>"	
-					+ "<tr style=\"text-align: center;\"><th>ID</th><th>Temp.</th><th>Datum</th></tr>";
-		
+		int page;
+		int bottomLimit;
+		int topLimit;
+		int sqlRows;
+		String measureTable = "";
 		Connection conn = connectToDatabse();
 		Statement statement;
+		
 		try {
 			statement = conn.createStatement();
 			String queryString;
 			if(param == null) {
-				queryString = "USE EmbeddedSensorCloud"
-					+ " "
-					+ "SELECT * FROM TEMPERATUR "
-					+ "ORDER BY MEASURENUMBER DESC";
+				page = 1;
 			}else{
-				int page = Integer.parseInt(param);
-				int topLimit = page * 15;
-				int bottomLimit = topLimit - 15;				
-			    
-				queryString = "USE EmbeddedSensorCloud"
-						+ " "							
-						+ "SELECT * FROM TEMPERATUR "
-						+ "WHERE MEASURENUMBER <" + topLimit + " AND MEASURENUMBER >" + bottomLimit 
-						+ "ORDER BY MEASURENUMBER DESC";
+				page = Integer.parseInt(param);
+				if(page < 1)
+				{
+					return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
+				}
+			}			    
+			topLimit = page * 15;
+			bottomLimit = topLimit - 15;
+			queryString = "USE EmbeddedSensorCloud"
+					+ " "
+					+ "SELECT count(*) FROM TEMPERATURE";
+			
+			ResultSet rs = statement.executeQuery(queryString);
+			rs.next();
+			sqlRows = Integer.parseInt(rs.getString(1));
+			
+			if(sqlRows < page*15-14)
+			{
+				return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
 			}
-		    ResultSet rs = statement.executeQuery(queryString);		   
+			
+			queryString = "USE EmbeddedSensorCloud"
+					+ " "
+					+ "SELECT * FROM TEMPERATURE "
+					+ "WHERE MEASUREMENTNUMBER <= " + sqlRows + " - " + bottomLimit + " AND MEASUREMENTNUMBER > " + sqlRows + " - " + topLimit 
+					+ "ORDER BY MEASUREMENTNUMBER DESC";
+			
+		    rs = statement.executeQuery(queryString);		   
 		    
-		    while (rs.next() && rowCount < 14) {
+		    measureTable += "<p style=\"text-align:center;\">"	
+					+ tableNavigation(param, sqlRows)
+					+ "</p>";
+			
+			measureTable += "<table style=\"margin:auto; border-bottom: 1px solid black; border-top: 1px solid black;\">" 
+						+ "<colgroup><col width=\"40\"><col width=\"80\"><col width=\"140\"> </colgroup>"	
+						+ "<tr style=\"text-align: center;\"><th>ID</th><th>Temp.</th><th>Datum</th></tr>";
+		    
+		    while(rs.next()) {
 		    	measureTable += "<tr style=\"text-align: center;\"><td>"+rs.getString(1)+"</td><td>"
 		    			+ rs.getString(2)+"&degC</td><td>"
 		    			+ rs.getString(3)+"</td></tr>";
-		    	rowCount++;
-		    }		    
+		    }
+		    
+		    measureTable += "</table>"
+					+ "<p style=\"text-align:center;\">"
+					+ tableNavigation(param, sqlRows)	    	    
+					+ "</p>";
 		   
 		}
 		catch (SQLException e) {
@@ -63,11 +86,6 @@ public class Temperatur implements Plugin {
 		catch(NumberFormatException e){
 			return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
 		}
-				
-		 measureTable += "</table>"
-					+ "<p style=\"text-align:center;\">"
-					+ tableNavigation(param)	    	    
-					+ "</p>";
 		
 		return measureTable;
 	}
@@ -89,7 +107,7 @@ public class Temperatur implements Plugin {
 		 }
 	}
 	
-	private String tableNavigation(String param) {
+	private String tableNavigation(String param, int sqlEntries) {
 		String tableNavi="";
 		
 		if(param != null) {		    	
@@ -102,16 +120,24 @@ public class Temperatur implements Plugin {
 						+ "href=\"http://localhost:8080/Temperatur/" + prevPage + "\">"
 						+ "<< PREVIOUS</a>";
 				
-		    	tableNavi += "<a style=\"text-decoration: none; padding-left: 30px;\"" 
-					+ "href=\"http://localhost:8080/Temperatur/" + nextPage + "\">"
-					+ "NEXT >></a>";												
-			}else {
-				tableNavi += "<span style=\"color: grey; padding-right: 30px;\"><< PREVIOUS</span>";
+		    	if(page*15 < sqlEntries) {
+			    	tableNavi += "<a style=\"text-decoration: none; padding-left: 30px;\"" 
+						+ "href=\"http://localhost:8080/Temperatur/" + nextPage + "\">"
+						+ "NEXT >></a>";
+		    	}else {
+		    		tableNavi += "<span style=\"color: grey; padding-left: 30px;\">NEXT >></span>";
+		    	}
+			}
 				
+			if(page == 1)
+			{
+				tableNavi += "<span style=\"color: grey; padding-right: 30px;\"><< PREVIOUS</span>";
+					
 				tableNavi += "<a style=\"text-decoration: none; padding-left: 30px;\"" 
 						+ "href=\"http://localhost:8080/Temperatur/"+ nextPage + "\"\">"
 						+ "NEXT >></a>";
 			}
+			
 	    }else {
 	    	tableNavi += "<span style=\"color: grey; padding-right: 30px;\"><< PREVIOUS</span>";
 				
