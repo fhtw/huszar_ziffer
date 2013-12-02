@@ -8,8 +8,7 @@ public class PluginManager {
 											// html file
 
 	public String execPlugin(String[] paramArray) {
-		String[] plugins = getFilesFromPath("./src/Plugins");
-		
+		String[] plugins = getFilesFromPath("./src/Plugins");		
 		
 		for(int i = 0 ; i < plugins.length; i++){
 			if(plugins[i].equals(paramArray[0])){
@@ -39,19 +38,19 @@ public class PluginManager {
 
 	public String listPlugins() {
 		String[] plugins = getFilesFromPath("./src/Plugins");
-		String htmlList = "<div id=\"plugin_navi\" style=\"border-bottom: 1px solid black; border-top: 1px solid black; margin-bottom: 20px;\">" + 
-						"<ul style=\"list-style-type:: none; text-align: center;\">";
+		String htmlList = "<div id=\"plugin_navi\" style=\"border-bottom: 1px solid black; border-top: 1px solid black; margin-bottom: 20px;\">"
+						+ "<ul style=\"list-style-type:: none; text-align: center;\">";
 		
 		for(int i = 0;i < plugins.length;i++){
-			htmlList += "<li style=\"padding-right: 15px; display: inline;\">" + 
-						"<a style=\"text-decoration: none; font-weight: bold;\"" +
-						"href=\"http://localhost:8080/" + plugins[i] + "\">" + plugins[i] + "</a> </li>";
+			htmlList += "<li style=\"padding-right: 15px; display: inline;\">" 
+					+ "<a style=\"text-decoration: none; font-weight: bold;\"" 
+					+ "href=\"http://localhost:8080/" + plugins[i] + "\">" + plugins[i] + "</a> </li>";
 		}
 		htmlList += "</ul></div>";
 		return htmlList;
 	}
 	
-	public String[] getFilesFromPath(String path){
+	private String[] getFilesFromPath(String path){
 		File dir = new File(path);
 		File[] files = dir.listFiles();
 		String plugins[] = new String[files.length];

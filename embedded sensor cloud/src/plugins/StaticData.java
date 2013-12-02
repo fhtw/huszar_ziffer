@@ -10,7 +10,8 @@ public class StaticData implements Plugin {
 
 	@Override
 	public String execPlugin(String param) {
-		String response = "", buffer;
+		String response = "";
+		String buffer = "";
 		
 		try {
 			FileReader path = new FileReader("./src/server/plugins.txt");

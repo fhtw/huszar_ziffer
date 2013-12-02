@@ -8,8 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Temperatur implements Plugin {
-	
+public class Temperatur implements Plugin {	
 
 	@Override
 	public String execPlugin(String param) {
@@ -45,11 +44,11 @@ public class Temperatur implements Plugin {
 			
 			ResultSet rs = statement.executeQuery(queryString);
 			rs.next();
-			sqlRows = Integer.parseInt(rs.getString(1));
+			sqlRows = Integer.parseInt(rs.getString(1)); //number of entries in table
 			
 			if(sqlRows < page*15-14)
 			{
-				return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
+				return "<p style =\"text-align: center;\"> Parameter zu gross! </p>";
 			}
 			
 			queryString = "USE EmbeddedSensorCloud"
@@ -65,7 +64,7 @@ public class Temperatur implements Plugin {
 					+ "</p>";
 			
 			measureTable += "<table style=\"margin:auto; border-bottom: 1px solid black; border-top: 1px solid black;\">" 
-						+ "<colgroup><col width=\"40\"><col width=\"80\"><col width=\"140\"> </colgroup>"	
+						+ "<colgroup><col width=\"40\"><col width=\"80\"><col width=\"220\"> </colgroup>"	
 						+ "<tr style=\"text-align: center;\"><th>ID</th><th>Temp.</th><th>Datum</th></tr>";
 		    
 		    while(rs.next()) {
@@ -82,6 +81,7 @@ public class Temperatur implements Plugin {
 		}
 		catch (SQLException e) {
 			System.err.println(e);
+			return "<p style =\"text-align: center;\"> Fehler mit Datenbankverbindung! </p>";
 		}
 		catch(NumberFormatException e){
 			return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
@@ -110,8 +110,8 @@ public class Temperatur implements Plugin {
 	private String tableNavigation(String param, int sqlEntries) {
 		String tableNavi="";
 		
-		if(param != null) {		    	
-	    	int page = Integer.parseInt(param);
+		if(param != null) {		
+			int page = Integer.parseInt(param);
 		    int nextPage = page+1;
 		    int prevPage = page-1;
 			

@@ -30,6 +30,7 @@ public class HttpResponse {
 		{
 			String buffer;	    		
 			PrintWriter out;
+			
 			try {
 				out = new PrintWriter(_socket.getOutputStream());
 				out.println(statusline);
@@ -65,6 +66,7 @@ public class HttpResponse {
 		{
 			String buffer;						    		
 			PrintWriter out;
+			
 			try {
 				out = new PrintWriter(_socket.getOutputStream());
 				out.println(statusline);

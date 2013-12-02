@@ -30,7 +30,7 @@ public class HttpServer
 				thread.start();//one thread go through the run() method one waits for client
 			} 
 			catch (IOException e) {
-			System.err.println("Accept failed.");
+				System.err.println("Accept failed.");
 			}
 		}
 	}
