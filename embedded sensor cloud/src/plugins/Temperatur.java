@@ -2,6 +2,7 @@ package plugins;
 
 import server.Plugin;
 
+import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -11,7 +12,7 @@ import java.sql.Statement;
 public class Temperatur implements Plugin {	
 
 	@Override
-	public String execPlugin(String param) {
+	public String execPlugin(String param, Socket socket) {
 		return readFromDatabase(param);
 	}
 	

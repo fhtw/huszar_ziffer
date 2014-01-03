@@ -1,13 +1,14 @@
 package server;
 
 import java.io.File;
+import java.net.Socket;
 
 public class PluginManager {
 
 	private String _pluginResponse = null; // will be written in a <p> in the
 											// html file
 
-	public String execPlugin(String[] paramArray) {
+	public String execPlugin(String[] paramArray, Socket socket) {
 		String[] plugins = getFilesFromPath("./src/Plugins");		
 		
 		for(int i = 0 ; i < plugins.length; i++){
@@ -15,9 +16,9 @@ public class PluginManager {
 				try {
 					Plugin plug = (Plugin)(Class.forName("plugins." + paramArray[0]).newInstance());
 					if(paramArray.length < 2){
-						_pluginResponse = plug.execPlugin(null);
+						_pluginResponse = plug.execPlugin(null, socket);
 					}else{
-						_pluginResponse = plug.execPlugin(paramArray[1]);
+						_pluginResponse = plug.execPlugin(paramArray[1], socket);
 					}
 					return _pluginResponse;
 				}

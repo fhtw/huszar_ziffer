@@ -84,7 +84,7 @@ public class HttpResponse {
     				}
 	    			br.close();
 	    		}
-	    		_pluginResponse = myPluginManager.execPlugin(_paramArray);
+	    		_pluginResponse = myPluginManager.execPlugin(_paramArray, _socket);
 		   		//give parameter to Pluginmanager and write response String into Printwriter
 		   		out.println(myPluginManager.listPlugins());
 		   		out.println(_pluginResponse);
