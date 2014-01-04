@@ -1,7 +1,12 @@
 package plugins;
 
 import server.Plugin;
+import server.PluginManager;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,9 +26,13 @@ public class Temperatur implements Plugin {
 		int bottomLimit;
 		int topLimit;
 		int sqlRows;
-		String measureTable = "";
+		String response = "";
+		String error = "";
 		Connection conn = connectToDatabse();
 		Statement statement;
+		
+		response = prepareResponse();
+		error = response;
 		
 		try {
 			statement = conn.createStatement();
@@ -34,7 +43,7 @@ public class Temperatur implements Plugin {
 				page = Integer.parseInt(param);
 				if(page < 1)
 				{
-					return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
+					return error + "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
 				}
 			}			    
 			topLimit = page * 15;
@@ -49,7 +58,7 @@ public class Temperatur implements Plugin {
 			
 			if(sqlRows < page*15-14)
 			{
-				return "<p style =\"text-align: center;\"> Parameter zu gross! </p>";
+				return error + "<p style =\"text-align: center;\"> Parameter zu gross! </p>";
 			}
 			
 			queryString = "USE EmbeddedSensorCloud"
@@ -60,35 +69,36 @@ public class Temperatur implements Plugin {
 			
 		    rs = statement.executeQuery(queryString);		   
 		    
-		    measureTable += "<p style=\"text-align:center;\">"	
+		    response += "<p style=\"text-align:center;\">"	
 					+ tableNavigation(param, sqlRows)
 					+ "</p>";
 			
-			measureTable += "<table style=\"margin:auto; border-bottom: 1px solid black; border-top: 1px solid black;\">" 
+		    response += "<table style=\"margin:auto; border-bottom: 1px solid black; border-top: 1px solid black;\">" 
 						+ "<colgroup><col width=\"40\"><col width=\"80\"><col width=\"220\"> </colgroup>"	
 						+ "<tr style=\"text-align: center;\"><th>ID</th><th>Temp.</th><th>Datum</th></tr>";
 		    
 		    while(rs.next()) {
-		    	measureTable += "<tr style=\"text-align: center;\"><td>"+rs.getString(1)+"</td><td>"
+		    	response += "<tr style=\"text-align: center;\"><td>"+rs.getString(1)+"</td><td>"
 		    			+ rs.getString(2)+"&degC</td><td>"
 		    			+ rs.getString(3)+"</td></tr>";
 		    }
 		    
-		    measureTable += "</table>"
+		    response += "</table>"
 					+ "<p style=\"text-align:center;\">"
 					+ tableNavigation(param, sqlRows)	    	    
 					+ "</p>";
 		   
 		}
 		catch (SQLException e) {
-			System.err.println(e);
-			return "<p style =\"text-align: center;\"> Fehler mit Datenbankverbindung! </p>";
+			System.err.println("SQL Error in Temperatur.");
+			return error + "<p style =\"text-align: center;\"> Fehler mit Datenbankverbindung! </p>";
 		}
 		catch(NumberFormatException e){
-			return "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
+			System.err.println("NumberFormat Error in Temperatur.");
+			return error + "<p style =\"text-align: center;\"> Falscher Parameter! </p>";
 		}
 		
-		return measureTable;
+		return response;
 	}
 	
 	private Connection connectToDatabse() {
@@ -103,7 +113,7 @@ public class Temperatur implements Plugin {
 		      return conn;		     
 		 }
          catch (Exception e) {
-        	 System.err.println(e);
+        	 System.err.println("Error in Temperatur.connectToDatabase().");
         	 return null;
 		 }
 	}
@@ -148,6 +158,33 @@ public class Temperatur implements Plugin {
 	    }
 		
 		return tableNavi;
+	}
+	
+	private String prepareResponse() {
+		String prepResponse = "";
+		String buffer = "";
+		FileReader fr;
+		PluginManager myPluginManager = new PluginManager();
+		
+		prepResponse = "HTTP/1.1 200 OK\n"
+				+ "Content-Type: text\n"
+				+ "\r\n";
+
+		try {
+			fr = new FileReader("./src/server/index.html");		
+
+			BufferedReader br = new BufferedReader(fr);
+			while((buffer = br.readLine()) != null)
+			{	
+				prepResponse += buffer;
+			}
+			br.close();
+		}catch (IOException e) {
+			System.err.println("Failed to open File in Temperatur.");
+		}
+		
+		prepResponse += myPluginManager.listPlugins();
+		return prepResponse;
 	}
 
 }

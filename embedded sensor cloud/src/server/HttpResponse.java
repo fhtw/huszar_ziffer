@@ -12,7 +12,7 @@ public class HttpResponse {
 	private Socket _socket;
 	private String statusline = "HTTP/1.1 200 OK";
 	private String crlf = "\r\n";
-	private String contentHtml = "Content-Type: text/html";
+	private String contentHtml = "Content-Type: text";
 	private String pathOfFrontpage = "./src/server/index.html";
 	private String[] _paramArray;
 	private String _pluginResponse = null;
@@ -38,16 +38,13 @@ public class HttpResponse {
 		   		out.println(crlf); 	
 	   		
     			FileReader fr = new FileReader(pathOfFrontpage);
-    			
-	    		if(fr != null)
-	    		{
-	   				BufferedReader br = new BufferedReader(fr);
-	   				while((buffer = br.readLine()) != null)
-	   				{	
-	   					out.println(buffer);
-    				}
-	    			br.close();
-	    		}
+	   			BufferedReader br = new BufferedReader(fr);
+	   			while((buffer = br.readLine()) != null)
+	   			{	
+	   				out.println(buffer);
+    			}
+	    		br.close();
+
 	    		out.println(myPluginManager.listPlugins());
 		   		out.println("</div>");
 		   		out.println("</body>");
@@ -55,57 +52,29 @@ public class HttpResponse {
 		   		out.flush();
 	    		out.close();
 	    		_socket.close();
-	    	} catch (FileNotFoundException e)
-	    	{
-	   			System.err.println("File not found.");
+	    	} catch (FileNotFoundException e){
+	   			System.err.println("File not found in HttpResponse.");
 	   		} catch (IOException e) {
-				System.err.println("Failed to open File.");
+				System.err.println("Failed to open File in HttpResponse.");
 			}
 		}
 		else
 		{
-			String buffer;						    		
 			PrintWriter out;
+			_pluginResponse = myPluginManager.execPlugin(_paramArray, _socket);
 			
 			try {
 				out = new PrintWriter(_socket.getOutputStream());
-				out.println(statusline);
-		   		out.println(contentHtml);
-		   		out.println(crlf);
 		   		
-    			FileReader fr = new FileReader(pathOfFrontpage);
-    			
-	    		if(fr != null)
-	    		{
-	   				BufferedReader br = new BufferedReader(fr);//write frontpage to Printwriter
-	   				while((buffer = br.readLine()) != null)
-	   				{	
-	   					out.println(buffer);
-    				}
-	    			br.close();
-	    		}
-	    		_pluginResponse = myPluginManager.execPlugin(_paramArray, _socket);
-		   		//give parameter to Pluginmanager and write response String into Printwriter
-		   		out.println(myPluginManager.listPlugins());
 		   		out.println(_pluginResponse);
 		   		out.println("</div>");
 		   		out.println("</body>");
 		   		out.println("</html>");
-		   		out.flush();// Printwriter is sent to browser
+		   		out.flush();
 	    		out.close();
-	    	} catch (FileNotFoundException e)
-	    	{
-	   			System.err.println("File not found.");
-	   			System.exit(1);
+	    		_socket.close();
 	   		} catch (IOException e) {
-				System.err.println("Failed to open File.");
-			}
-			finally {
-				try {
-					_socket.close();
-				} catch (IOException e) {
-					System.err.println("Failed to close socket.");
-				}
+				System.err.println("Failed to open File in HttpResponse.");
 			}
 		}
     }

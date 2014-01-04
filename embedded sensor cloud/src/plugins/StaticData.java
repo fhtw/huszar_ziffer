@@ -4,6 +4,7 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.Socket;
 
 import server.Plugin;
@@ -13,26 +14,29 @@ public class StaticData implements Plugin {
 	public String execPlugin(String param) {return null;}
 
 	public String execPlugin(String param, Socket socket) {
-		String response = "";
-		//String buffer = "";
-		
+		String httpHeader = "HTTP/1.1 200 OK\n"
+				+ "Content-Type: image/gif\n"
+				+ "\r\n";
+		int read = 0;
 		
 		try {
-			FileInputStream fileInput = new FileInputStream("./src/server/plugins.txt");
+			FileInputStream fileInput = new FileInputStream("./src/server/test.gif");
             DataOutputStream socketOut = new DataOutputStream(socket
                     .getOutputStream());
-            int read = 0;
+            
+            socketOut.writeBytes(httpHeader);
+            
             while ((read = fileInput.read()) != -1) {
-                socketOut.write(read);
+                socketOut.writeByte(read);
             }
             socketOut.flush();
             fileInput.close();
             socket.close();
         } catch (FileNotFoundException e) {
-			System.err.println("Failed to open File.");
+			System.err.println("Failed to open File in StaticData.");
 		} 
 		catch (IOException e) {
-			System.err.println("Failed to read File.");
+			System.err.println("Failed to read File in StaticData.");
 		}
 		
 		
@@ -60,7 +64,7 @@ public class StaticData implements Plugin {
 			System.err.println("Failed to read File.");
 		}*/
 		
-		return response;
+		return null;
 	}
 
 }
