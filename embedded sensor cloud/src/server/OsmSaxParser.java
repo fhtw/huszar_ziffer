@@ -9,8 +9,8 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Parse an OSM XML file and print all names of 'way' elements.
- * @author Kompf
+ * Parse an OSM XML file and give back a Hashtable with streets and their cities they exitst in.
+ * @author Stefan, Georg
  *
  */
 public class OsmSaxParser {
@@ -34,6 +34,7 @@ public class OsmSaxParser {
     SAXParser parser = parserFactory.newSAXParser();
 
     OsmNamesHandler handler = new OsmNamesHandler();
+    System.out.print("parsing...");
     parser.parse(file, handler);
     System.out.print("finished parsing!");
     
@@ -43,7 +44,8 @@ public class OsmSaxParser {
   }
 
   private static class OsmNamesHandler extends DefaultHandler {
-    private final Stack<String> eleStack = new Stack<String>();
+    private final Stack<String> nodeStack = new Stack<String>();
+    private final Stack<String> wayStack = new Stack<String>();
     public Hashtable<String, List <String> > ht = new Hashtable<String, List <String> >();
     private List<String> _list = new ArrayList <String>();
     private List<String> _copyList = new ArrayList <String>();
@@ -59,9 +61,12 @@ public class OsmSaxParser {
         Attributes attrs) throws SAXException {
        //System.out.printf("element: uri=%s localName=%s qName=%s\n", uri, localName, qName);
       if("node".equals(qName) ){
-    	  eleStack.push(qName);
+    	  nodeStack.push(qName);
       }
-      if ("tag".equals(qName) && !eleStack.isEmpty()) {
+      if("way".equals(qName) ){
+    	  wayStack.push(qName);
+      }
+      if ("tag".equals(qName) && (!nodeStack.isEmpty() || !wayStack.isEmpty())) {
 		    String key = attrs.getValue("k");
 		    if ("addr:city".equals(key)){
 		        //_list.add(attrs.getValue("v"));
@@ -70,9 +75,9 @@ public class OsmSaxParser {
 		    if("addr:street".equals(key)) {
 		    	//_list.add(attrs.getValue("v"));
 		    	street = attrs.getValue("v");
-		    	/*if(street.equals("Rudolf-Zeller-Gasse")){
-		    		System.out.println(street);
-		    	}*/
+		    	if(street.equals("Rudolf-Zeller-Gasse")){
+		    		//System.out.println(street);
+		    	}
 		    }
 		    if(street != null && city != null){
 		    	_list.add(city);
@@ -80,8 +85,8 @@ public class OsmSaxParser {
 		    		_copyList = ht.get(street);
 		    		if(!containsString(_copyList, _list.get(0))){
 			    		ht.remove(street);
-			    		System.out.println("_copyList = " + _copyList + "\n");
-			    		System.out.println("_list = " + _list);
+			    		//System.out.println("_copyList = " + _copyList + "\n");
+			    		//System.out.println("_list = " + _list);
 			    		_list.addAll(_copyList);
 			    		ht.put(street, _list);
 		    		}
@@ -91,8 +96,8 @@ public class OsmSaxParser {
 		    	//System.out.print("city = " +_city + " , street = " + _street + "\n");
 		        _list = new ArrayList <String>();
 		        _copyList = new ArrayList <String>();
-		        city = null;
-		        street = null;
+		        //city = null;
+		        //street = null;
 		    }
 	  }
     }
@@ -101,10 +106,15 @@ public class OsmSaxParser {
     public void endElement(String uri, String localName, String qName)
         throws SAXException {
     	if("node".equals(qName) ){
-      	  eleStack.pop();
+      	  nodeStack.pop();
       	  city = null;
       	  street = null;
         }
+    	if("way".equals(qName) ){
+        	  wayStack.pop();
+        	  city = null;
+        	  street = null;
+          }
     }
     
     private boolean containsString(List <String> myList, String search){

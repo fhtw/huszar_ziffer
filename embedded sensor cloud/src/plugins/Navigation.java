@@ -3,7 +3,10 @@ package plugins;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.Socket;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -18,48 +21,75 @@ import java.util.List;
 public class Navigation implements Plugin {
 	
 	List<String> citiesList = new ArrayList <String>();
+	String utf8 = "UTF-8";
 	String streetname;
 	public static Hashtable<String,List <String> > cityHashtable;
+	static boolean isRefreshing = false;
 	@Override
 	public String execPlugin(String param, Socket socket) {
 		
 		String response = prepareResponse();
 		
-		response += "<form name=\"input\" action=\"http://localhost:8080/Navigation/\" method=\"get\">" + 
-					"Username: <input type=\"text\" name=\"streetname\">" + 
+		response += "<p>Please type in a streetname and the program is going to show you cities in austria where the street exists in!</p>" +
+				"<form name=\"input\" action=\"http://localhost:8080/Navigation/\" method=\"get\">" + 
+					"Streetname: <input type=\"text\" name=\"streetname\">" +
 					"<input type=\"submit\" value=\"Submit\">" +
-					"</form>";
-		
-		if(param == null){
-			try {
-				 OsmSaxParser saxParser = new OsmSaxParser();
-				 cityHashtable = new Hashtable<String, List <String> >();
-				 cityHashtable = saxParser.getHashtable();
-				 
-			} catch (ParserConfigurationException e) {
-				System.out.print("ParserConfigurationException thrown!");
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.out.print("Exception thrown in saxParser!");
+					"</form>"
+					+ "<a style=\"text-decoration: none; color: green;\" href=\"http://localhost:8080/Navigation/refresh\"> refresh map</a>"
+					+ "<br/>";
+	if(param != null){
+		if(param.equals("refresh")){
+			if(!isRefreshing){
+				cityHashtable = null;
+				isRefreshing = true;
+				getHashtable();
+				isRefreshing = false;
+			}else{
+				response += "<p style= color:orange>The map is already refreshing by an other user. Please, wait a minute.</p>";
+				return response;
 			}
 		}else{
-			if(cityHashtable == null){
-				System.out.print("hashtable is null");
-			}
-			streetname = param.substring(12);
-			System.out.println(streetname);
-			citiesList = getCityOf(streetname);
-			if(citiesList != null){
-				for(int i = 0;i<citiesList.size();i++){
-					response += "<p>" + citiesList.get(i).toString() + "</p>";
+				if(cityHashtable == null){
+					System.out.print("hashtable is null");
+					response += "<p style= color:red>You have to press \"refresh map\" before you type in a streetname!</p>";
+					return response;
 				}
-			}else{
-				response += "<p>" + "There is no street registered with that name in the openstreetmap!" + "</p>";
+				streetname = param.substring(12);
+				try {
+					streetname = URLDecoder.decode(streetname, utf8);
+				} catch (UnsupportedEncodingException e) {
+					streetname = null;
+					System.out.println("Textinput include non supported character!");
+				}
+				System.out.println(streetname);
+				citiesList = getCityOf(streetname);
+				if(citiesList != null){
+					for(int i = 0;i<citiesList.size();i++){
+							response += "<p>" + citiesList.get(i).toString() + "</p>";
+					}
+				}else{
+					response += "<p>" + "There is no street registered with that name in the openstreetmap!" + "</p>";
+				}
 			}
-		}
-		return response;
 	}
+	return response;
+}
 	
+	private /*static synchronized*/ void getHashtable() {
+		try {
+			 OsmSaxParser saxParser = new OsmSaxParser();
+			 cityHashtable = new Hashtable<String, List <String> >();
+			 cityHashtable = saxParser.getHashtable();
+			 
+		} catch (ParserConfigurationException e) {
+			System.out.print("ParserConfigurationException thrown!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.print("Exception thrown in saxParser!");
+		}
+		
+	}
+
 	public List<String> getCityOf(String streetname){
 		  
 		  List<String> list = new ArrayList <String>();
@@ -74,7 +104,7 @@ public class Navigation implements Plugin {
 		PluginManager myPluginManager = new PluginManager();
 		
 		prepResponse = "HTTP/1.1 200 OK\n"
-				+ "Content-Type: text\n"
+				+ "Content-Type: text; charset=utf-8\n"
 				+ "\r\n";
 
 		try {
