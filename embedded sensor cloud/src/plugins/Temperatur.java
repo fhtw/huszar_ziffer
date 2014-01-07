@@ -119,6 +119,7 @@ public class Temperatur implements Plugin {
 	private String createXML(String param, Socket socket) {
 		String queryString = "";
 		String error = "";
+		int sqlRows = 0;
 		Connection conn = connectToDatabse();
 		Statement statement;
 		
@@ -129,12 +130,30 @@ public class Temperatur implements Plugin {
 			
 			queryString = "USE EmbeddedSensorCloud"
 					+ " "
+					+ "SELECT count(*) FROM TEMPERATURE "
+					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "
+					+ "MEASUREMENTTIME <= '" + param + " 23:59:00'";
+			
+			System.out.println(queryString);
+			
+			ResultSet rs = statement.executeQuery(queryString);
+			rs.next();
+			sqlRows = Integer.parseInt(rs.getString(1)); //number of entries in table
+			System.out.println(sqlRows);
+			
+			if(sqlRows < 1) {
+				return error + "<p style =\"text-align: center;\"> Keine Daten f&uumlr gew&uumlnschtes Datum vorhanden! </p>";
+			}
+			
+			
+			queryString = "USE EmbeddedSensorCloud"
+					+ " "
 					+ "SELECT * FROM TEMPERATURE "
 					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "
 					+ "MEASUREMENTTIME <= '" + param + " 23:59:00'"
 					+ "ORDER BY MEASUREMENTNUMBER DESC";
 			
-			ResultSet rs = statement.executeQuery(queryString);
+			rs = statement.executeQuery(queryString);
 			
 			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -183,7 +202,6 @@ public class Temperatur implements Plugin {
 			return error + "<p style =\"text-align: center;\"> Fehler mit XML-Erstellung! </p>";
 		}
 		
-		//return error + "<p style =\"text-align: center;\"> Keine Daten für gewünschtes Datum vorhanden! </p>";
 	}
 	
 	private Connection connectToDatabse() {
@@ -252,7 +270,7 @@ public class Temperatur implements Plugin {
 		PluginManager myPluginManager = new PluginManager();
 		
 		prepResponse = "HTTP/1.1 200 OK\n"
-				+ "Content-Type: text\n"
+				+ "Content-Type: text; charset=utf-8\n"
 				+ "\r\n";
 
 		try {
