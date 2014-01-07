@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -37,18 +36,18 @@ public class Navigation implements Plugin {
 					"</form>"
 					+ "<a style=\"text-decoration: none; color: green;\" href=\"http://localhost:8080/Navigation/refresh\"> refresh map</a>"
 					+ "<br/>";
-	if(param != null){
-		if(param.equals("refresh")){
-			if(!isRefreshing){
-				cityHashtable = null;
-				isRefreshing = true;
-				getHashtable();
-				isRefreshing = false;
-			}else{
-				response += "<p style= color:orange>The map is already refreshing by an other user. Please, wait a minute.</p>";
+		if(param != null){
+			if(param.equals("refresh")){
+				if(!isRefreshing){
+					cityHashtable = null;
+					isRefreshing = true;
+					getHashtable();
+					isRefreshing = false;
+				}else{
+					response += "<p style= color:orange>The map is already refreshing by an other user. Please, wait a minute.</p>";
 				return response;
-			}
-		}else{
+				}
+			}else{
 				if(cityHashtable == null){
 					System.out.print("hashtable is null");
 					response += "<p style= color:red>You have to press \"refresh map\" before you type in a streetname!</p>";
@@ -71,9 +70,9 @@ public class Navigation implements Plugin {
 					response += "<p>" + "There is no street registered with that name in the openstreetmap!" + "</p>";
 				}
 			}
-	}
+		}
 	return response;
-}
+	}
 	
 	private /*static synchronized*/ void getHashtable() {
 		try {

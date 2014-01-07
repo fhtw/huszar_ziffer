@@ -1,10 +1,6 @@
 package plugins;
 
-import server.Plugin;
-import server.PluginManager;
-
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.Socket;
@@ -14,13 +10,32 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import server.Plugin;
+import server.PluginManager;
+
 public class Temperatur implements Plugin {	
 
 	@Override
 	public String execPlugin(String param, Socket socket) {
-		return readFromDatabase(param);
+		if(param != null && param.matches("\\d{4}-\\d{2}-\\d{2}")) {
+			return createXML(param, socket);
+		} else {
+			return readFromDatabase(param);
+		}
 	}
-	
+		
 	private String readFromDatabase(String param) {			
 		int page;
 		int bottomLimit;
@@ -99,6 +114,76 @@ public class Temperatur implements Plugin {
 		}
 		
 		return response;
+	}
+	
+	private String createXML(String param, Socket socket) {
+		String queryString = "";
+		String error = "";
+		Connection conn = connectToDatabse();
+		Statement statement;
+		
+		error = prepareResponse();
+		
+		try {
+			statement = conn.createStatement();
+			
+			queryString = "USE EmbeddedSensorCloud"
+					+ " "
+					+ "SELECT * FROM TEMPERATURE "
+					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "
+					+ "MEASUREMENTTIME <= '" + param + " 23:59:00'"
+					+ "ORDER BY MEASUREMENTNUMBER DESC";
+			
+			ResultSet rs = statement.executeQuery(queryString);
+			
+			DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+			
+			//root elements of xml file
+			Document doc = docBuilder.newDocument();
+			
+			Element rootElement = doc.createElement("TemperaturXML");
+			doc.appendChild(rootElement);
+			
+			while(rs.next()) {			  
+			
+			  //date elements
+			  Element date = doc.createElement("Date");
+			  date.appendChild(doc.createTextNode(rs.getString(3)));
+			  rootElement.appendChild(date);
+			  
+			  //temperatur as attribute
+			  date.setAttribute("Degree", rs.getString(2));
+
+			}
+			  //write the content into xml file and send it to socket
+			  TransformerFactory transformerFactory = TransformerFactory.newInstance();
+			  Transformer transformer = transformerFactory.newTransformer();
+			  DOMSource source = new DOMSource(doc);
+			
+			  StreamResult result =  new StreamResult(socket.getOutputStream());
+			  transformer.transform(source, result);
+			  
+			  socket.close();
+			  return null;
+
+		}catch (SQLException e) {
+			e.printStackTrace();
+			System.err.println("SQL Error in Temperatur.createXML().");
+			return error + "<p style =\"text-align: center;\"> Fehler mit Datenbankverbindung! </p>";
+		}catch(ParserConfigurationException e){
+			  e.printStackTrace();
+			  return error + "<p style =\"text-align: center;\"> Fehler mit XML-Erstellung! </p>";
+		}catch(TransformerException e){
+			  e.printStackTrace();
+			  return error + "<p style =\"text-align: center;\"> Fehler mit XML-Erstellung! </p>";
+		}catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("SQL Error in Temperatur.createXML().");
+			return error + "<p style =\"text-align: center;\"> Fehler mit XML-Erstellung! </p>";
+		}
+		
+		//return error + "<p style =\"text-align: center;\"> Keine Daten für gewünschtes Datum vorhanden! </p>";
 	}
 	
 	private Connection connectToDatabse() {
