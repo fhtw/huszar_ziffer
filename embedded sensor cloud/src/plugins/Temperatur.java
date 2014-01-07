@@ -131,13 +131,8 @@ public class Temperatur implements Plugin {
 			queryString = "USE EmbeddedSensorCloud"
 					+ " "
 					+ "SELECT count(*) FROM TEMPERATURE "
-<<<<<<< HEAD
-					+ "WHERE DATE >= '" + param + " 00:00:00' AND "
-					+ "DATE <= '" + param + " 23:59:00'";
-=======
 					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "
 					+ "MEASUREMENTTIME <= '" + param + " 23:59:00'";
->>>>>>> dev
 			
 			System.out.println(queryString);
 			
