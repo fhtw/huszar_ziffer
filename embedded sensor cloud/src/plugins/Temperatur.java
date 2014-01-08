@@ -63,7 +63,7 @@ public class Temperatur implements Plugin {
 			}			    
 			topLimit = page * 15;
 			bottomLimit = topLimit - 15;
-			queryString = "USE EmbeddedSensorCloud"
+			queryString = "USE embeddedSensorCloud"
 					+ " "
 					+ "SELECT count(*) FROM TEMPERATURE";
 			
@@ -76,7 +76,7 @@ public class Temperatur implements Plugin {
 				return error + "<p style =\"text-align: center;\"> Parameter zu gross! </p>";
 			}
 			
-			queryString = "USE EmbeddedSensorCloud"
+			queryString = "USE embeddedSensorCloud"
 					+ " "
 					+ "SELECT * FROM TEMPERATURE "
 					+ "WHERE MEASUREMENTNUMBER <= " + sqlRows + " - " + bottomLimit + " AND MEASUREMENTNUMBER > " + sqlRows + " - " + topLimit 
@@ -128,7 +128,7 @@ public class Temperatur implements Plugin {
 		try {
 			statement = conn.createStatement();
 			
-			queryString = "USE EmbeddedSensorCloud"
+			queryString = "USE embeddedSensorCloud"
 					+ " "
 					+ "SELECT count(*) FROM TEMPERATURE "
 					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "
@@ -146,7 +146,7 @@ public class Temperatur implements Plugin {
 			}
 			
 			
-			queryString = "USE EmbeddedSensorCloud"
+			queryString = "USE embeddedSensorCloud"
 					+ " "
 					+ "SELECT * FROM TEMPERATURE "
 					+ "WHERE MEASUREMENTTIME >= '" + param + " 00:00:00' AND "

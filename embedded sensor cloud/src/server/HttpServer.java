@@ -16,7 +16,7 @@ public class HttpServer
 	private Socket clientSocket = null;
 	private ServerSocket serverSocket = null;
 	
-	HttpServer()
+	public HttpServer()
 	{
 		try {
 			serverSocket = new ServerSocket(8080); //build a socket on port 8080
@@ -72,9 +72,9 @@ public class HttpServer
 		
 		try {
 			statement = conn.createStatement();
-			queryString = "USE EmbeddedSensorCloud"
+			queryString = "USE embeddedSensorCloud"
 					+ " "
-					+ "INSERT INTO TEMPERATURE (MEASUREMENTNUMBER, MEASUREMENTTIME)"
+					+ "INSERT INTO TEMPERATURE (VALUE, MEASUREMENTTIME)"
 					+ "VALUES(" + temp + ",'" + new Timestamp(date.getTime()) + "')";
 		
 			statement.execute(queryString);

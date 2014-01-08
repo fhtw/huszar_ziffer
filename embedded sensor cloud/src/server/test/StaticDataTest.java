@@ -1,0 +1,30 @@
+package server.test;
+
+import static org.junit.Assert.*;
+
+import java.net.Socket;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import plugins.StaticData;
+
+public class StaticDataTest {
+
+	Socket _socket;
+	String _param;
+
+	@Before public void instantiate(){
+		
+		_socket = new Socket(); 
+		_param = "Arbeiterstrandbadstraﬂe";
+		return;
+	}
+	
+	@Test
+	public void testExecPlugin() {
+		StaticData sd =new StaticData();
+		sd.execPlugin(_param, _socket);
+	}
+
+}
