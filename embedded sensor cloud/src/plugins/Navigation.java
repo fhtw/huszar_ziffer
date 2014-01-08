@@ -29,13 +29,15 @@ public class Navigation implements Plugin {
 		
 		String response = prepareResponse();
 		
-		response += "<p>Please type in a streetname and the program is going to show you cities in austria where the street exists in!</p>" +
-				"<form name=\"input\" action=\"http://localhost:8080/Navigation/\" method=\"get\">" + 
-					"Streetname: <input type=\"text\" name=\"streetname\">" +
-					"<input type=\"submit\" value=\"Submit\">" +
-					"</form>"
-					+ "<a style=\"text-decoration: none; color: green;\" href=\"http://localhost:8080/Navigation/refresh\"> refresh map</a>"
-					+ "<br/>";
+		response += "<p style=\"text-align: center;\">Please type in a streetname and the program will show you in which austrian cities it extists!</p>"
+				+ "<div style=\"margin: auto; text-align: center;\">"
+				+ "<form name=\"input\" action=\"http://localhost:8080/Navigation/\" method=\"get\">"
+				+ "Streetname: <input type=\"text\" name=\"streetname\">"
+				+ "<input type=\"submit\" value=\"Submit\">"
+				+ "</form>"
+				+ "<a style=\"text-decoration: none; color: green;\" href=\"http://localhost:8080/Navigation/refresh\"> refresh map</a>"
+				+ "</div>"
+				+ "<br/>";
 		if(param != null){
 			if(param.equals("refresh")){
 				if(!isRefreshing){
@@ -44,13 +46,13 @@ public class Navigation implements Plugin {
 					getHashtable();
 					isRefreshing = false;
 				}else{
-					response += "<p style= color:orange>The map is already refreshing by an other user. Please, wait a minute.</p>";
+					response += "<p style=\"color:orange; text-align:center;\">The map is already refreshing by an other user. Please, wait a minute.</p>";
 				return response;
 				}
 			}else{
 				if(cityHashtable == null){
 					System.out.print("hashtable is null");
-					response += "<p style= color:red>You have to press \"refresh map\" before you type in a streetname!</p>";
+					response += "<p style=\"color:red; text-align: center;\">You have to press \"refresh map\" before you type in a streetname!</p>";
 					return response;
 				}
 				streetname = param.substring(12);
@@ -64,14 +66,14 @@ public class Navigation implements Plugin {
 				citiesList = getCityOf(streetname);
 				if(citiesList != null){
 					for(int i = 0;i<citiesList.size();i++){
-							response += "<p>" + citiesList.get(i).toString() + "</p>";
+						response += "<p style=\"text-align: center;\">" + citiesList.get(i).toString() + "</p>";
 					}
 				}else{
-					response += "<p>" + "There is no street registered with that name in the openstreetmap!" + "</p>";
+					response += "<p style =\"text-align: center;\"> There is no street registered with that name in the openstreetmap! </p>";
 				}
 			}
 		}
-	return response;
+		return response;
 	}
 	
 	private /*static synchronized*/ void getHashtable() {
@@ -85,8 +87,7 @@ public class Navigation implements Plugin {
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.out.print("Exception thrown in saxParser!");
-		}
-		
+		}		
 	}
 
 	public List<String> getCityOf(String streetname){
