@@ -74,7 +74,7 @@ public class HttpServer
 			statement = conn.createStatement();
 			queryString = "USE EmbeddedSensorCloud"
 					+ " "
-					+ "INSERT INTO TEMPERATURE (DEGREE, DATE)"
+					+ "INSERT INTO TEMPERATURE (MEASUREMENTNUMBER, MEASUREMENTTIME)"
 					+ "VALUES(" + temp + ",'" + new Timestamp(date.getTime()) + "')";
 		
 			statement.execute(queryString);

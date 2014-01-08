@@ -30,7 +30,7 @@ public class StaticData implements Plugin {
             }
             socketOut.flush();
             fileInput.close();
-            socket.close();
+            //socket.close();
         } catch (FileNotFoundException e) {
 			System.err.println("Failed to open File in StaticData.");
 		} 

@@ -74,7 +74,7 @@ public class HttpResponse {
 	    		out.close();
 	    		_socket.close();
 	   		} catch (IOException e) {
-				System.err.println("Failed to open File in HttpResponse.");
+				System.err.println("Failed to close socket in HttpResponse.");
 			}
 		}
     }
