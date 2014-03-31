@@ -17,7 +17,7 @@ public class HttpResponse {
 	private String[] _paramArray;
 	private String _pluginResponse = null;
 	
-	HttpResponse(Socket s, String[] paramArray) //clientsocket and parameter are saved as private variable
+	public HttpResponse(Socket s, String[] paramArray) //clientsocket and parameter are saved as private variable
 	{
 		_socket = s;
 		_paramArray = paramArray;
