@@ -20,16 +20,7 @@ public class HttpServer
 	{
 		try {
 			serverSocket = new ServerSocket(8080); //build a socket on port 8080
-			Timer timer = new Timer ();
-			TimerTask hourlyTask = new TimerTask () {
-			    @Override
-			    public void run () {
-			        simulateTemperatureSensor();
-			    }
-			};
-			//schedule timer to execute every hour
-			timer.schedule(hourlyTask, 0l, 1000*60*60);
-		} 
+		}
 		catch (IOException e) {
         	System.err.println("Could not listen on port: 8080.");
         	System.exit(1);

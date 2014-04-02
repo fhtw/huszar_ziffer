@@ -13,6 +13,7 @@ public class BusinessLayer {
 
 	public List<Contact> searchContacts() {
 		_contacts = new ArrayList<Contact>();
+		
 		return _contacts = _dal.searchContacts(null, false, false, 0, 0);
 		
 	}
