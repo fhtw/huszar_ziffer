@@ -1,0 +1,28 @@
+package server;
+
+import static org.junit.Assert.*;
+
+import java.net.ServerSocket;
+import java.net.Socket;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class HttpResponseTest {
+	
+	Socket _socket;
+	String[] _paramArray;
+	
+	@Before public void instantiate(){
+		
+		_socket = new Socket(); 
+		_paramArray[0] = "Sportnews";
+	}
+
+	@Test
+	public void testProcessResponse() {
+		new HttpResponse(_socket, _paramArray);
+		return;
+	}
+
+}

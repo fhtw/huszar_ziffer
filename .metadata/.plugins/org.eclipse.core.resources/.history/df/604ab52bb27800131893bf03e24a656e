@@ -1,0 +1,14 @@
+package plugins;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class SportnewsTest {
+
+	@Test
+	public void testExecPlugin() {
+		fail("Not yet implemented");
+	}
+
+}

@@ -1,0 +1,19 @@
+package server;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class HttpServerTest {
+
+	@Test
+	public void testHttpServer() {
+		fail("Not yet implemented");
+	}
+
+	@Test
+	public void testListenAndProcess() {
+		fail("Not yet implemented");
+	}
+
+}

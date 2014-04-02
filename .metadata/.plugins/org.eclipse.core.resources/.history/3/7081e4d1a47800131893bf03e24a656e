@@ -1,0 +1,26 @@
+package server.test;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import server.PluginManager;
+
+public class PluginManagerTest {
+
+	@Test
+	public void testListPlugins() {
+		PluginManager tester = new PluginManager();
+		String testString = tester.listPlugins();
+		assertNotNull(testString);
+	}
+	
+	@Test
+	public String[] testgetFilesFromPath(String path){
+		PluginManager tester = new PluginManager();
+		String[] = tester.getFilesFromPath("./src/Plugins");
+		
+		
+		return null;
+	}
+}

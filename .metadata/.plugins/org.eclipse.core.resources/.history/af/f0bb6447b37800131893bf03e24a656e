@@ -1,0 +1,14 @@
+package plugins;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+public class StaticDataTest {
+
+	@Test
+	public void testExecPluginStringSocket() {
+		fail("Not yet implemented");
+	}
+
+}

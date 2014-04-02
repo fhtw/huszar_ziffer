@@ -1,0 +1,3 @@
+Dieser Text wird angezeigt wenn man auf Static Data klickt!!
+
+lg =)

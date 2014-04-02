@@ -1,0 +1,6 @@
+1388671250458	Move compilation unit
+1388676265504	Move file
+1388676281432	Move compilation unit
+1388692030385	Encapsulate field '_nodeStarted'
+1388767645665	Infer generic type arguments
+1388788067528	Rename type 'OsmSaxNames'

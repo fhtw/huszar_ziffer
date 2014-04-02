@@ -1,0 +1,15 @@
+package server;
+
+import org.junit.Test;
+
+public class OsmSaxParserTest {
+
+	@Test (expected=Exception.class)
+	public void testOsmSaxParser() throws Exception {
+		OsmSaxParser saxParser = new OsmSaxParser();
+		return;
+	}
+	
+	
+
+}

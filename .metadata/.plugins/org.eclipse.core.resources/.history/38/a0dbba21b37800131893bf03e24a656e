@@ -1,0 +1,28 @@
+package plugins;
+
+import static org.junit.Assert.*;
+
+import java.net.Socket;
+
+import org.junit.Before;
+import org.junit.Test;
+
+public class TemperaturTest {
+
+	Socket _socket;
+	String _param;
+
+	@Before public void instantiate(){
+		
+		_socket = new Socket(); 
+		_param = null;
+		return;
+	}
+	
+	@Test
+	public void testExecPlugin() {
+		Temperatur temp = new Temperatur();
+		temp.execPlugin(_param, _socket);
+	}
+
+}

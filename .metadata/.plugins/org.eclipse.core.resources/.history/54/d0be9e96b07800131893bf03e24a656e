@@ -1,0 +1,28 @@
+package server.test;
+
+import java.net.Socket;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import plugins.Navigation;
+
+public class NavigationTest {
+	
+	Socket _socket;
+	String _param;
+
+	@Before public void instantiate(){
+		
+		_socket = new Socket(); 
+		_param = "Hauptstraﬂe";
+		return;
+	}
+	
+	@Test
+	public void testExecPlugin() {
+		Navigation navi =new Navigation();
+		navi.execPlugin(_param, _socket);
+	}
+
+}
