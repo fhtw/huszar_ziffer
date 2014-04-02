@@ -45,7 +45,7 @@ public class DataLinkLayer {
       contact.set_suffix(resultSet.getString("suffix"));
       contact.set_surname(resultSet.getString("surname"));
       contact.set_lastname(resultSet.getString("lastname"));
-      contact.set_dateOfBirth(resultSet.getDate("dateofbirth"));
+      contact.set_dateOfBirth(resultSet.getDate("dateofbirth").toString());
       contact.set_employedAt(resultSet.getString("employedAt"));
       contact.set_address(resultSet.getString("address"));
       contact.set_plz(resultSet.getInt("plz"));

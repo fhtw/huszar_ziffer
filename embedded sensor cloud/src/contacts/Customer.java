@@ -10,7 +10,7 @@ public class Customer implements Contact {
 	private String _suffix;
 	private String _surname;
 	private String _lastname;	
-	private Date _dateOfBirth;
+	private String _dateOfBirth;
 	private String _employedAt;
 	private String _address;
 	private int _plz;
@@ -87,11 +87,11 @@ public class Customer implements Contact {
 		this._suffix = _suffix;
 	}
 	
-	public Date get_dateOfBirth() {
+	public String get_dateOfBirth() {
 		return _dateOfBirth;
 	}
 	
-	public void set_dateOfBirth(Date date) {
+	public void set_dateOfBirth(String date) {
 		this._dateOfBirth = date;
 	}
 	
