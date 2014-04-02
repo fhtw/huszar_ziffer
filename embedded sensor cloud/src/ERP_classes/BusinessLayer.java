@@ -1,21 +1,16 @@
 package ERP_classes;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import contacts.Contact;
+import contacts.CustomerList;
 
 
 public class BusinessLayer {
 	
 	DataLinkLayer _dal = new DataLinkLayer();
-	List<Contact> _contacts = null;
+	CustomerList _contacts = null;
 
-	public List<Contact> searchContacts() {
-		_contacts = new ArrayList<Contact>();
+	public CustomerList listAllContacts() {
+		_contacts = new CustomerList();
 		
-		return _contacts = _dal.searchContacts(null, false, false, 0, 0);
-		
+		return _contacts = _dal.listAllContacts(null, false, false, 0, 0);		
 	}
-
 }

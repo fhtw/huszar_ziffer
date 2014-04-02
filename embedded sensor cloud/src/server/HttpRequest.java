@@ -44,11 +44,16 @@ public class HttpRequest implements Runnable {
 			        new InputStreamReader(_socket.getInputStream()));
 			
 			String param = in.readLine();
-	    	
-	    	if(param.length() >= 15)
+			
+			System.out.println(param);
+
+	    	if(param != null && param.length() >= 15)
 	    	{
 	    	   	param = param.substring(5, (param.length()-9));
 	    	   	_paramArray = param.split("/");
+	    	   	for(int i=0; i < _paramArray.length; i++){
+	    	   		System.out.println("Param " + i + _paramArray[i]);
+	    	   	}
 	    	}else
 	    	{
 	    		_paramArray = new String[1];

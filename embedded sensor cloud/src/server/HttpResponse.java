@@ -28,7 +28,7 @@ public class HttpResponse {
 		PluginManager myPluginManager = new PluginManager();
 		if(_paramArray[0] == null)
 		{
-			String buffer;	    		
+			String buffer;    		
 			PrintWriter out;
 			
 			try {
@@ -67,9 +67,6 @@ public class HttpResponse {
 				out = new PrintWriter(_socket.getOutputStream());
 		   		
 		   		out.println(_pluginResponse);
-		   		out.println("</div>");
-		   		out.println("</body>");
-		   		out.println("</html>");
 		   		out.flush();
 	    		out.close();
 	    		_socket.close();
