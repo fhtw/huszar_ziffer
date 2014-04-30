@@ -1,8 +1,8 @@
 package server;
 
-import java.net.Socket;
+import java.util.List;
 
 public interface Plugin {
 	
-	public String execPlugin(String param, Socket socket);// what the plugin should do
+	public String execPlugin(String[] param, List<QueryObject> query);// what the plugin should do
 }

@@ -70,7 +70,7 @@ public class DataLinkLayer {
 			  // this will load the MySQL driver, each DB has its own driver
 			  Class.forName("com.mysql.jdbc.Driver");
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
-				    		+ "user=root&password=!eps1loN");
+				    		+ "user=Stefan&password=ziffer");
 					
 			  statement = connect.createStatement();
 			  resultSet = statement.executeQuery("SELECT * from CUSTOMER");

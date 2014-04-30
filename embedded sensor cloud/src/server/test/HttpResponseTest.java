@@ -21,7 +21,7 @@ public class HttpResponseTest {
 
 	@Test
 	public void testProcessResponse() {
-		new HttpResponse(_socket, _paramArray);
+		new HttpResponse(_socket, _paramArray, null);
 		return;
 	}
 

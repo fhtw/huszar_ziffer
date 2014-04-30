@@ -6,6 +6,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 public class HttpResponse {
 	
@@ -16,11 +19,13 @@ public class HttpResponse {
 	private String pathOfFrontpage = "./src/server/index.html";
 	private String[] _paramArray;
 	private String _pluginResponse = null;
+	private List<QueryObject> _queryList;
 	
-	public HttpResponse(Socket s, String[] paramArray) //clientsocket and parameter are saved as private variable
+	public HttpResponse(Socket s, String[] paramArray, List queryList) //clientsocket and parameter are saved as private variable
 	{
 		_socket = s;
 		_paramArray = paramArray;
+		_queryList = queryList;
 	}
 	
 	public void processResponse() //write the index.html in PrintWriter and check Plugins
@@ -61,7 +66,7 @@ public class HttpResponse {
 		else
 		{
 			PrintWriter out;
-			_pluginResponse = myPluginManager.execPlugin(_paramArray, _socket);
+			_pluginResponse = myPluginManager.execPlugin(_paramArray, _queryList);
 			
 			try {
 				out = new PrintWriter(_socket.getOutputStream());

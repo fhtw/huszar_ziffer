@@ -1,6 +1,8 @@
 package plugins;
 
-import java.net.Socket;
+
+import java.util.List;
+import server.QueryObject;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
@@ -16,9 +18,9 @@ public class MikroERP_Facade implements Plugin {
 	CustomerList _customerList = null;
 
 	@Override
-	public String execPlugin(String param, Socket socket) {
+	public String execPlugin(String[] param, List<QueryObject> query) {
 		
-		if("SearchContacts".equals(param)){
+		if("listAllContacts".equals(param)){
 			
 			_customerList = new CustomerList();
 			_customerList = _bl.listAllContacts();
@@ -31,7 +33,13 @@ public class MikroERP_Facade implements Plugin {
 			// OBJECT --> XML
 			String xml = xs.toXML(_customerList);
 			return xml;
-		}		
-		return null;
+		}
+		String returned = null;
+		for(QueryObject q : query) {
+            System.out.println("Key = " + q.get_key() + " Value = " + q.get_value());
+            returned += "Key = " + q.get_key() + " Value = " + q.get_value();
+        }
+		
+		return returned;
 	}
 }
