@@ -11,7 +11,7 @@ public class HttpRequest implements Runnable {
 	
 	private Socket _socket;
 	private String[] _paramArray;
-	private List<QueryObject> _queryList;
+	private List<QueryObject> _queryList = null;
 
 	// Constructor
     HttpRequest(Socket socket)
@@ -53,22 +53,33 @@ public class HttpRequest implements Runnable {
 			//System.out.println("URL = " + url.toString());
 			System.out.println("Request = " + param);
 
-	    	if(param != null && param.length() >= 15)
+	    	if(param != null && param.length() >= 15)//größer 15 weil diese länge bedeutet das ein parameter existiert
+	    											//-> GET / HTTP/1.1 wäre länge 14; ab 15 steht etwas nach dem slash
 	    	{
 	    	   	param = param.substring(5, (param.length()-9));
 	    	   	_paramArray = param.split("/");
 	    	   String[] query =_paramArray[_paramArray.length - 1].split("\\?");//[0] = letzer param; [1] - [unendlich] alle queries
 	    	   _paramArray[_paramArray.length-1] = query[0];//letzten param speichern in paramArray
-	    	   query =query[query.length - 1].split("&");
-	    	   String[] keyValue;
-	    	   QueryObject queryObject;
-	    	   _queryList = new ArrayList<QueryObject>();
-	    	   for(int i=0; i < query.length; i++){
-	    	   		System.out.println("Query " + i +" = " + query[i]);
-	    	   		keyValue = query[i].split("=");
-	    	   		queryObject = new QueryObject(keyValue[0],keyValue[1]);
-	    	   		_queryList.add(queryObject);    	   		
-	    	   	}
+	    	   //if(query.length > 1){
+		    	   try{
+			    		   query =query[query.length - 1].split("&");
+				    	   String[] keyValue;
+				    	   QueryObject queryObject;
+				    	   _queryList = new ArrayList<QueryObject>();
+				    	   for(int i=0; i < query.length; i++){
+				    	   		//System.out.println("Query " + i +" = " + query[i]);
+				    		   //zum ausgeben der queries
+				    	   		keyValue = query[i].split("=");
+				    	   		queryObject = new QueryObject(keyValue[0],keyValue[1]);
+				    	   		_queryList.add(queryObject);
+				    	   }
+			    	   }catch(ArrayIndexOutOfBoundsException e){
+			    		   System.out.println("ArrayIndexOutOfBoundsException : Wrong parameter! It has to be url?key=value!");
+			    		   QueryObject queryObject;
+			    		   queryObject = new QueryObject("Error","Error");
+			    	   		_queryList.add(queryObject);
+			    	   }
+	    	   	//}
 	    	}else
 	    	{
 	    		_paramArray = new String[1];

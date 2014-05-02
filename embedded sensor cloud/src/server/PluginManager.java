@@ -15,11 +15,7 @@ public class PluginManager {
 			if(plugins[i].equals(paramArray[0])){
 				try {
 					Plugin plug = (Plugin)(Class.forName("plugins." + paramArray[0]).newInstance());
-					if(paramArray.length < 2){
-						_pluginResponse = plug.execPlugin(null,null);
-					}else{
-						_pluginResponse = plug.execPlugin(paramArray, queryList);
-					}
+					_pluginResponse = plug.execPlugin(paramArray, queryList);
 					return _pluginResponse;
 				}
 				catch(InstantiationException e){

@@ -1,6 +1,5 @@
 package contacts;
 
-import java.sql.Date;
 
 public class Customer implements Contact {
 

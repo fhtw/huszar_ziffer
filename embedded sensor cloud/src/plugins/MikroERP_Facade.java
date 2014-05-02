@@ -35,11 +35,18 @@ public class MikroERP_Facade implements Plugin {
 			return xml;
 		}
 		String returned = null;
-		for(QueryObject q : query) {
-            System.out.println("Key = " + q.get_key() + " Value = " + q.get_value());
-            returned += "Key = " + q.get_key() + " Value = " + q.get_value();
-        }
-		
+		if(query == null){
+			System.out.println("Liste ist null");
+		}
+		if(param == null){
+			System.out.println("param ist null");
+		}
+		if(query != null){
+			for(QueryObject q : query) {
+	            System.out.println("Key = " + q.get_key() + " Value = " + q.get_value());
+	            returned += "Key = " + q.get_key() + " Value = " + q.get_value() + "\n";
+	        }
+		}
 		return returned;
 	}
 }
