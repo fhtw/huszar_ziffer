@@ -20,7 +20,7 @@ public class MikroERP_Facade implements Plugin {
 	@Override
 	public String execPlugin(String[] param, List<QueryObject> query) {
 		
-		if("listAllContacts".equals(param)){
+		if("listAllContacts".equals(param[1])){
 			
 			_customerList = new CustomerList();
 			_customerList = _bl.listAllContacts();
@@ -33,20 +33,18 @@ public class MikroERP_Facade implements Plugin {
 			// OBJECT --> XML
 			String xml = xs.toXML(_customerList);
 			return xml;
+		} else {		
+			String returned = null;
+			if(query == null){
+				System.out.println("Liste ist null");
+			}
+			if(query != null){
+				for(QueryObject q : query) {
+		            System.out.println("Key = " + q.get_key() + " Value = " + q.get_value());
+		            returned += "Key = " + q.get_key() + " Value = " + q.get_value() + "\n";
+		        }
+			}
+			return returned;
 		}
-		String returned = null;
-		if(query == null){
-			System.out.println("Liste ist null");
-		}
-		if(param == null){
-			System.out.println("param ist null");
-		}
-		if(query != null){
-			for(QueryObject q : query) {
-	            System.out.println("Key = " + q.get_key() + " Value = " + q.get_value());
-	            returned += "Key = " + q.get_key() + " Value = " + q.get_value() + "\n";
-	        }
-		}
-		return returned;
 	}
 }
