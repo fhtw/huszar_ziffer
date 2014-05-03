@@ -45,12 +45,7 @@ public class HttpRequest implements Runnable {
     	try {
 			in = new BufferedReader(
 			        new InputStreamReader(_socket.getInputStream()));
-			
-			
 			String param = in.readLine();
-			
-			
-			//System.out.println("URL = " + url.toString());
 			System.out.println("Request = " + param);
 
 	    	if(param != null && param.length() >= 15)//größer 15 weil diese länge bedeutet das ein parameter existiert
@@ -60,7 +55,7 @@ public class HttpRequest implements Runnable {
 	    	   	_paramArray = param.split("/");
 	    	   String[] query =_paramArray[_paramArray.length - 1].split("\\?");//[0] = letzer param; [1] - [unendlich] alle queries
 	    	   _paramArray[_paramArray.length-1] = query[0];//letzten param speichern in paramArray
-	    	   //if(query.length > 1){
+	    	   if(query.length > 1){
 		    	   try{
 			    		   query =query[query.length - 1].split("&");
 				    	   String[] keyValue;
@@ -79,7 +74,7 @@ public class HttpRequest implements Runnable {
 			    		   queryObject = new QueryObject("Error","Error");
 			    	   		_queryList.add(queryObject);
 			    	   }
-	    	   	//}
+	    	   	}
 	    	}else
 	    	{
 	    		_paramArray = new String[1];
