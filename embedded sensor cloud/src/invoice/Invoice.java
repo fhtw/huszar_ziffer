@@ -119,5 +119,6 @@ public class Invoice {
 	
 	public void set_articles(ArrayList<InvoiceElement> _articles) {
 		this._articles = _articles;
+
 	}
 }

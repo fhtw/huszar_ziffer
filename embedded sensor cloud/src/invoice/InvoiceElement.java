@@ -5,6 +5,7 @@ public class InvoiceElement {
 	private String _name;
 	private int _amount;
 	private float _price;
+	
 	public String get_name() {
 		return _name;
 	}

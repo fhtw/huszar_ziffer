@@ -1,7 +1,9 @@
 package contacts;
 
+import invoice.InvoiceList;
 
-public class Customer implements Contact {
+
+public class Customer {
 
 	private String _uid;
 	private String _name;
@@ -12,9 +14,30 @@ public class Customer implements Contact {
 	private String _dateOfBirth;
 	private String _employedAt;
 	private String _address;
+	private String _invoiceAddress;
+	private String _shippingAddress;
 	private int _plz;
-	private String _city;	
+	private String _city;
+	private InvoiceList _invoices;
 	
+	public String get_invoiceAddress() {
+		return _invoiceAddress;
+	}
+	public void set_invoiceAddress(String _invoiceAddress) {
+		this._invoiceAddress = _invoiceAddress;
+	}
+	public String get_shippingAddress() {
+		return _shippingAddress;
+	}
+	public void set_shippingAddress(String _shippingAddress) {
+		this._shippingAddress = _shippingAddress;
+	}
+	public InvoiceList get_invoices() {
+		return _invoices;
+	}
+	public void set_invoices(InvoiceList _invoices) {
+		this._invoices = _invoices;
+	}
 	public String get_uid() {
 		return _uid;
 	}

@@ -1,2 +1,10 @@
 /ERP_classes
+<<<<<<< HEAD
 /plugins
+=======
+/contacts
+/invoice
+/plugins
+/server
+/Exceptions
+>>>>>>> f7deefb23ad613ee67be00e5801ac88279a90d16
