@@ -68,8 +68,9 @@ public class MikroERP_Facade implements Plugin {
 		            returned += "Key = " + q.get_key() + " Value = " + q.get_value() + "\n";
 		        }
 			}
-		return returned;
+			return returned;
 		}
+		return null;
 	}
 		
 
