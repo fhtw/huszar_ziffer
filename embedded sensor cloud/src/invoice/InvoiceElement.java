@@ -4,8 +4,7 @@ public class InvoiceElement {
 
 	private String _name;
 	private int _amount;
-	private float _price;
-	
+	private double _price;
 	public String get_name() {
 		return _name;
 	}
@@ -21,11 +20,11 @@ public class InvoiceElement {
 		this._amount = _amount;
 	}
 	
-	public float get_price() {
+	public double get_price() {
 		return _price;
 	}
 	
-	public void set_price(float _price) {
+	public void set_price(double _price) {
 		this._price = _price;
 	}
 }
