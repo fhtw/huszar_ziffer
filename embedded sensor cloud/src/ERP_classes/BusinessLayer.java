@@ -12,10 +12,10 @@ public class BusinessLayer {
 	CustomerList _contacts = null;
 	InvoiceList _invoices = null;
 
-	public CustomerList listAllContacts() {
+	public CustomerList searchContacts(String surname,String lastname, String businessname) {
 		_contacts = new CustomerList();
 		
-		return _contacts = _dal.listAllContacts(null, false, false, 0, 0);		
+		return _contacts = _dal.searchContacts(surname,lastname,businessname);		
 	}
 	
 	public InvoiceList searchInvoices(String name,

@@ -27,10 +27,12 @@ public class MikroERP_Facade implements Plugin {
 	@Override
 	public String execPlugin(String[] param, List<QueryObject> query) {
 		if(param.length > 1){			
-			if("listAllContacts".equals(param[1])){
+			if("searchContacts".equals(param[1])){
 			
 				_customerList = new CustomerList();
-				_customerList = _bl.listAllContacts();
+				_customerList = _bl.searchContacts(getValueFromKey(query,"surname"),
+									getValueFromKey(query,"lastname"),
+										getValueFromKey(query,"businessname"));
 				
 				XStream xs = new XStream(new StaxDriver());
 				xs.alias("Customer", Customer.class);

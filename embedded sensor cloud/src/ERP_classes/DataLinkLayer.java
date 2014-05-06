@@ -78,11 +78,9 @@ public class DataLinkLayer {
 	
 	
 	
-	  public CustomerList listAllContacts(String text, 
-		    boolean onlyActive, 
-		    boolean onlyDeleted, 
-		    int openInvoicesFrom, 
-		    int openInvoicesTo) {
+	  public CustomerList searchContacts(String surname, 
+		    String lastname, 
+		    String businessname) {
 		  
 		  CustomerList contacts = new CustomerList();
 		
@@ -91,9 +89,28 @@ public class DataLinkLayer {
 			  Class.forName("com.mysql.jdbc.Driver");
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 				    		+ "user=root&password=!eps1loN");
-					
-			  statement = connect.createStatement();
-			  resultSet = statement.executeQuery("SELECT * from CUSTOMER");
+			
+			  preparedStatement = connect
+					    .prepareStatement("SELECT * from CUSTOMER where (surname = ? "
+					    		+ "AND lastname = ?) "
+					    		+ "OR name = ?");
+			  if(surname == null){//if name was not set
+					preparedStatement.setString(1, "*");
+				}else{
+					preparedStatement.setString(1, surname);//weiß nicht wie mans besser lösen kann!!
+				}
+				if(lastname == null){//if fromDate was not set
+					preparedStatement.setString(2, "*");
+				}else{
+					preparedStatement.setString(2, lastname);
+				}
+				if(businessname == null){//if toDate was not set
+					preparedStatement.setString(3,"*");
+				}else{
+					preparedStatement.setString(3, businessname);
+				}
+			  
+			  resultSet = preparedStatement.executeQuery();
 			  //writeMetaData(resultSet);
 			  contacts = getContactsFromResultSet(resultSet);				
 		  } catch (SQLException e) {
