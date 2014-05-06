@@ -9,7 +9,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Date;
 
 import contacts.Customer;
 import contacts.CustomerList;
@@ -116,26 +115,57 @@ public class DataLinkLayer {
 	}
 	
 	
-	public InvoiceList getInvoicesFromCustomer(String name,
-			Date fromDate, 
-			Date toDate,
-			int fromAmount,
-			int toAmount){
+	public InvoiceList searchInvoices(String name,
+			java.sql.Date fromDate, 
+			java.sql.Date toDate,
+			double fromAmount,
+			double toAmount){
 		
 		InvoiceList invoices = new InvoiceList();
 		
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
-				    		+ "user=Stefan&password=ziffer");
+				    		+ "user=root&password=!eps1loN");
 			int customerId = getIdFromName(name);
 			//preparedStatements can use variables and are more efficient
 			preparedStatement = connect
-			    .prepareStatement("SELECT * from INVOICES where fkCustomerId = ?");
+			    .prepareStatement("SELECT * from INVOICES where fkCustomerId RLIKE ?"
+			    		+ " AND expirationDate BETWEEN ? AND ? "
+			    		+ "AND gross BETWEEN ? AND ?");
+			System.out.println("name: " + name);
+			System.out.println("fromDate: " + fromDate);
+			System.out.println("toDate: " + toDate);
+			System.out.println("fromAmount: " + fromAmount);
+			System.out.println("toAmount: " + toAmount);
 			 //parameters start with 1
-			 
-			preparedStatement.setInt(1, customerId);
-			
+			System.out.println("customerId: " + customerId);
+			if(customerId <= -1){//if name was not set
+				preparedStatement.setString(1, ".*");
+			}else{
+				preparedStatement.setInt(1, customerId);//weiß nicht wie mans besser lösen kann!!
+			}
+			if(fromDate == null){//if fromDate was not set
+				preparedStatement.setString(2, "*");
+			}else{
+				preparedStatement.setDate(2, fromDate);
+			}
+			if(toDate == null){//if toDate was not set
+				preparedStatement.setString(3,"3000-01-01");
+			}else{
+				preparedStatement.setDate(3, toDate);
+			}
+			if(fromAmount <= -1){//if fromAmount was not set
+				preparedStatement.setString(4, "*");
+			}else{
+				preparedStatement.setDouble(4, fromAmount);
+			}
+			if(toAmount <= -1){//if toAmount was not set
+				preparedStatement.setDouble(5, Double.MAX_VALUE);
+			}else{
+				preparedStatement.setDouble(5, toAmount);
+			}
+			System.out.println(preparedStatement);
 			//preparedStatement.setDate(6, new java.sql.Date(1990, 12, 11));
 			resultSet = preparedStatement.executeQuery();
 			

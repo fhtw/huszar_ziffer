@@ -4,6 +4,8 @@ package plugins;
 import invoice.Invoice;
 import invoice.InvoiceList;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import server.QueryObject;
@@ -14,7 +16,6 @@ import com.thoughtworks.xstream.io.xml.StaxDriver;
 import contacts.Customer;
 import contacts.CustomerList;
 import ERP_classes.BusinessLayer;
-import Exceptions.NameNotSetException;
 import server.Plugin;
 
 public class MikroERP_Facade implements Plugin {
@@ -39,10 +40,12 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(_customerList);
 				return xml;
-			} else if("getInvoicesFromCustomer".equals(param[1])){
-				try{
+			} else if("searchInvoices".equals(param[1])){//if no query isset all invoices in database return
 					_invoiceList = new InvoiceList();
-					_invoiceList = _bl.getInvoicesFromCustomer(getValueFromKey(query,"name"), null, null, 0, 0);
+					
+					_invoiceList = _bl.searchInvoices(getValueFromKey(query,"name"), getDateFromKey(query,"fromDate"), getDateFromKey(query,"toDate"),
+														getDoubleFromKey(query,"fromAmount"),
+															getDoubleFromKey(query,"toAmount"));
 					
 					XStream xs = new XStream(new StaxDriver());
 					xs.alias("Invoice", Invoice.class);
@@ -52,10 +55,6 @@ public class MikroERP_Facade implements Plugin {
 					// OBJECT --> XML
 					String xml = xs.toXML(_invoiceList);
 					return xml;
-				}catch(NameNotSetException e){
-					System.out.println("Facade: \"getInvoicesFromCustomer\" called but no parameter \"name = value\" set!");
-					return null;
-				}
 			}
 		} else {		
 			String returned = null;
@@ -74,16 +73,47 @@ public class MikroERP_Facade implements Plugin {
 	}
 		
 
-	private String getValueFromKey(List<QueryObject> query,String key) throws NameNotSetException {
+	private String getValueFromKey(List<QueryObject> query,String key){
 		try{
 		for(QueryObject q : query) {
             if(key.equals(q.get_key())){
-            	return q.get_value();
+            	return q.get_value();//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
             }
         }
 		}catch(NullPointerException e){
-			throw new NameNotSetException();
+			return null;
 		}
-		throw new NameNotSetException();
+		return null;
+	}
+	
+	private double getDoubleFromKey(List<QueryObject> query,String key){
+		try{
+		for(QueryObject q : query) {
+            if(key.equals(q.get_key())){
+            	return Double.parseDouble(q.get_value());//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
+            }
+        }
+		}catch(NullPointerException e){
+			return -1;
+		}
+		return -1;
+	}
+	
+	private java.sql.Date getDateFromKey(List<QueryObject> query,String key){
+		try{
+		for(QueryObject q : query) {
+            if(key.equals(q.get_key())){
+            	SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
+    			java.util.Date utilDate = simpleDate.parse(q.get_value());
+    			java.sql.Date date = new java.sql.Date(utilDate.getTime());
+            	return date;
+            }
+        }
+		}catch(NullPointerException e){
+			return null;
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
