@@ -40,7 +40,7 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(_customerList);
 				return xml;
-			} else if("searchInvoices".equals(param[1])){//if no query isset all invoices in database return
+			} else if("searchInvoices".equals(param[1])){ //if no query isset all invoices in database return
 					_invoiceList = new InvoiceList();
 					
 					_invoiceList = _bl.searchInvoices(getValueFromKey(query,"name"), getDateFromKey(query,"fromDate"), getDateFromKey(query,"toDate"),

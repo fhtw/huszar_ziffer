@@ -25,27 +25,30 @@ public class DataLinkLayer {
 	  // resultSet is initialised before the first data set
 		CustomerList contacts = new CustomerList();
 		  
-	    while (resultSet.next()) {
-		    // also possible to get the columns via the column number
-		    // which starts at 1
-		    // e.g., resultSet.getSTring(2);
-	    	Customer contact = new Customer();
-	    	contact.set_name(resultSet.getString("name"));
-	    	contact.set_uid(resultSet.getString("uid"));
-		    contact.set_title(resultSet.getString("title"));
-		    contact.set_suffix(resultSet.getString("suffix"));
-		    contact.set_surname(resultSet.getString("surname"));
-		    contact.set_lastname(resultSet.getString("lastname"));
-		    contact.set_dateOfBirth(resultSet.getDate("dateOfBirth").toString());
-		    contact.set_employedAt(resultSet.getString("employedAt"));
-		    contact.set_address(resultSet.getString("address"));
-		    contact.set_shippingAddress(resultSet.getString("shippingAddress"));
-		    contact.set_invoiceAddress(resultSet.getString("invoiceAddress"));
-		    contact.set_plz(resultSet.getInt("plz"));
-		    contact.set_city(resultSet.getString("city"));
-	      
-		    contacts.add(contact);
-	    }
+		try{
+			while (resultSet.next()) {
+			    // also possible to get the columns via the column number
+			    // which starts at 1
+			    // e.g., resultSet.getSTring(2);
+		    	Customer contact = new Customer();
+		    	contact.set_name(resultSet.getString("name"));
+		    	contact.set_uid(resultSet.getString("uid"));
+			    contact.set_title(resultSet.getString("title"));
+			    contact.set_suffix(resultSet.getString("suffix"));
+			    contact.set_surname(resultSet.getString("surname"));
+			    contact.set_lastname(resultSet.getString("lastname"));
+			    contact.set_dateOfBirth(resultSet.getDate("dateOfBirth").toString());
+			    contact.set_employedAt(resultSet.getString("employedAt"));
+			    contact.set_address(resultSet.getString("address"));
+			    contact.set_plz(resultSet.getInt("plz"));
+			    contact.set_city(resultSet.getString("city"));
+		      
+			    contacts.add(contact);
+		    }
+			return contacts;
+		} catch(NullPointerException e){
+			
+		}
 		return contacts;
 	}
 	
@@ -112,8 +115,7 @@ public class DataLinkLayer {
 	    for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
 	      System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
 	    }
-	}
-	
+	}	
 	
 	public InvoiceList searchInvoices(String name,
 			java.sql.Date fromDate, 
@@ -183,10 +185,11 @@ public class DataLinkLayer {
 		
 		try{
 			preparedStatement = connect
-			    .prepareStatement("SELECT id from CUSTOMER where name = ? OR lastname = ?");
+			    .prepareStatement("SELECT id from CUSTOMER where name = ? OR surname = ? OR lastname = ?");
 			
 			preparedStatement.setString(1, name);
 			preparedStatement.setString(2, name);
+			preparedStatement.setString(3, name);
 			
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next()){//has to be called!cause you need the cursor point on the id

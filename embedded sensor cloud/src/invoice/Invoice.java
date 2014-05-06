@@ -11,11 +11,12 @@ public class Invoice {
 	private String _comment;
 	private String _message;
 	private String _customerName;
+	private String _customerLastname;
 	private String _shippingAddress;
 	private String _invoiceAddress;
-	private float _ust;
-	private float _gross; //brutto
-	private float _net;
+	private double _ust;
+	private double _gross; //brutto
+	private double _net;
 	private ArrayList<InvoiceElement> _articles;
 	
 	public int get_invoiceNumber() {
@@ -73,6 +74,14 @@ public class Invoice {
 		this._customerName = _customerName;
 	}
 	
+	public String get_customerLastname() {
+		return _customerLastname;
+	}
+	
+	public void set_customerLastname(String _customerLastname) {
+		this._customerLastname = _customerLastname;
+	}
+	
 	public String get_shippingAddress() {
 		return _shippingAddress;
 	}
@@ -89,27 +98,27 @@ public class Invoice {
 		this._invoiceAddress = _invoiceAddress;
 	}
 	
-	public float get_ust() {
+	public double get_ust() {
 		return _ust;
 	}
 	
-	public void set_ust(float _ust) {
+	public void set_ust(double _ust) {
 		this._ust = _ust;
 	}
 	
-	public float get_gross() {
+	public double get_gross() {
 		return _gross;
 	}
 	
-	public void set_gross(float _gross) {
+	public void set_gross(double _gross) {
 		this._gross = _gross;
 	}
 	
-	public float get_net() {
+	public double get_net() {
 		return _net;
 	}
 	
-	public void set_net(float _net) {
+	public void set_net(double _net) {
 		this._net = _net;
 	}
 	
@@ -117,8 +126,7 @@ public class Invoice {
 		return _articles;
 	}
 	
-	public void set_articles(ArrayList<InvoiceElement> _articles) {
-		this._articles = _articles;
-
+	public void set_articles(ArrayList<InvoiceElement> tmpInvoiceElements) {
+		this._articles = tmpInvoiceElements;
 	}
 }

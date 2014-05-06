@@ -1,13 +1,12 @@
 package invoice;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import invoice.Invoice;
 
 public class InvoiceList {
 
-	private List<Invoice> _invoiceList;
+	private ArrayList<Invoice> _invoiceList;
 
     public InvoiceList(){
     	_invoiceList = new ArrayList<Invoice>();
@@ -17,7 +16,7 @@ public class InvoiceList {
     	_invoiceList.add(c);
     }
     
-    public List<Invoice> getInvoices() {
+    public ArrayList<Invoice> getInvoices() {
     	return _invoiceList;
     }
 }

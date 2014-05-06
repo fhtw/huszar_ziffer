@@ -1,8 +1,5 @@
 package contacts;
 
-import invoice.InvoiceList;
-
-
 public class Customer {
 
 	private String _uid;
@@ -14,30 +11,9 @@ public class Customer {
 	private String _dateOfBirth;
 	private String _employedAt;
 	private String _address;
-	private String _invoiceAddress;
-	private String _shippingAddress;
 	private int _plz;
 	private String _city;
-	private InvoiceList _invoices;
 	
-	public String get_invoiceAddress() {
-		return _invoiceAddress;
-	}
-	public void set_invoiceAddress(String _invoiceAddress) {
-		this._invoiceAddress = _invoiceAddress;
-	}
-	public String get_shippingAddress() {
-		return _shippingAddress;
-	}
-	public void set_shippingAddress(String _shippingAddress) {
-		this._shippingAddress = _shippingAddress;
-	}
-	public InvoiceList get_invoices() {
-		return _invoices;
-	}
-	public void set_invoices(InvoiceList _invoices) {
-		this._invoices = _invoices;
-	}
 	public String get_uid() {
 		return _uid;
 	}
@@ -65,8 +41,8 @@ public class Customer {
 		return _plz;
 	}
 
-	public void set_plz(int i) {
-		this._plz = i;
+	public void set_plz(int _plz) {
+		this._plz = _plz;
 	}
 
 	public String get_city() {
@@ -113,8 +89,8 @@ public class Customer {
 		return _dateOfBirth;
 	}
 	
-	public void set_dateOfBirth(String date) {
-		this._dateOfBirth = date;
+	public void set_dateOfBirth(String _dateOfBirth) {
+		this._dateOfBirth = _dateOfBirth;
 	}
 	
 	public String get_employedAt() {
