@@ -3,7 +3,7 @@ package invoice;
 import java.util.ArrayList;
 
 public class Invoice {
-
+ 
 	private int _invoiceNumber;
 	private boolean _isOutgoing;
 	private String _creationDate;
@@ -11,7 +11,6 @@ public class Invoice {
 	private String _comment;
 	private String _message;
 	private String _customerName;
-	private String _customerLastname;
 	private String _shippingAddress;
 	private String _invoiceAddress;
 	private double _ust;
@@ -72,14 +71,6 @@ public class Invoice {
 	
 	public void set_customerName(String _customerName) {
 		this._customerName = _customerName;
-	}
-	
-	public String get_customerLastname() {
-		return _customerLastname;
-	}
-	
-	public void set_customerLastname(String _customerLastname) {
-		this._customerLastname = _customerLastname;
 	}
 	
 	public String get_shippingAddress() {

@@ -2,7 +2,9 @@ package ERP_classes;
 
 import java.sql.Date;
 
+import invoice.Invoice;
 import invoice.InvoiceList;
+import contacts.Customer;
 import contacts.CustomerList;
 
 
@@ -26,5 +28,17 @@ public class BusinessLayer {
 		_invoices = new InvoiceList();
 		
 		return _invoices = _dal.searchInvoices(name, fromDate, toDate, fromAmount, toAmount);		
+	}
+
+	public String createInvoice(Invoice invoice) {
+		
+		return _dal.createInvoice(invoice);
+		
+	}
+	
+	public String createCustomer(Customer customer) {
+		
+		return _dal.createCustomer(customer);
+		
 	}
 }

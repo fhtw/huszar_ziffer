@@ -8,14 +8,12 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import contacts.Customer;
 import contacts.CustomerList;
 
 
 public class DataLinkLayer {
-	private Statement statement = null;
 	private PreparedStatement preparedStatement = null;
 	//private PreparedStatement preparedStatement = null; //für update bzw delete statements
 	private ResultSet resultSet = null;
@@ -123,16 +121,6 @@ public class DataLinkLayer {
 		  }
 		  return contacts;
 	  }
-
-	@SuppressWarnings("unused")
-	private void writeMetaData(ResultSet resultSet) throws SQLException {
-	    
-	    System.out.println("The columns in the table are: ");
-	    System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-	    for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
-	      System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
-	    }
-	}	
 	
 	public InvoiceList searchInvoices(String name,
 			java.sql.Date fromDate, 
@@ -197,16 +185,113 @@ public class DataLinkLayer {
 		return invoices;
 		
 	}
+	
+	public String createCustomer(Customer customer) {
+		
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+				    		+ "user=root&password=!eps1loN");
+			//preparedStatements can use variables and are more efficient
+			  preparedStatement = connect
+					    .prepareStatement("INSERT INTO mikroerp.customer("
+					    		+ "uid,name,title,suffix,surname,lastname,"
+					    		+ "dateOfBirth,employedAt,address,plz,city)"
+					    		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?)");
+					//1 - 11 ?
+			  if(customer.get_lastname() == null){//if it is a business
+				  preparedStatement.setString(1,customer.get_uid());
+				  preparedStatement.setString(2,customer.get_name());
+				  preparedStatement.setNull(3,java.sql.Types.VARCHAR);
+				  preparedStatement.setNull(4,java.sql.Types.VARCHAR);
+				  preparedStatement.setNull(5,java.sql.Types.VARCHAR);
+				  preparedStatement.setNull(6,java.sql.Types.VARCHAR);
+				  preparedStatement.setNull(7,java.sql.Types.VARCHAR);
+				  preparedStatement.setNull(8,java.sql.Types.VARCHAR);
+				  preparedStatement.setString(9,customer.get_address());
+				  preparedStatement.setInt(10,customer.get_plz());
+				  preparedStatement.setString(11,customer.get_city());   
+			  }else{//if it is a person
+				  preparedStatement.setNull(1,java.sql.Types.INTEGER);
+				  preparedStatement.setNull(2,java.sql.Types.VARCHAR);
+				  preparedStatement.setString(3,customer.get_title());
+				  preparedStatement.setString(4,customer.get_suffix());
+				  preparedStatement.setString(5,customer.get_surname());
+				  preparedStatement.setString(6,customer.get_lastname());
+				  preparedStatement.setString(7,customer.get_dateOfBirth());
+				  preparedStatement.setString(8,customer.get_employedAt());
+				  preparedStatement.setString(9,customer.get_address());
+				  preparedStatement.setInt(10,customer.get_plz());
+				  preparedStatement.setString(11,customer.get_city()); 
+			  }
+						
+			
+			preparedStatement.executeUpdate();
+			return "0";
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+			return "1";
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return "1";
+		}
+		
+	}
+	
+public String createInvoice(Invoice invoice) {
+		
+		try{ 
+			Class.forName("com.mysql.jdbc.Driver");
+			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+				    		+ "user=root&password=!eps1loN");
+			//preparedStatements can use variables and are more efficient
+			  int customerId = getIdFromName(invoice.get_customerName());
+			  preparedStatement = connect
+					    .prepareStatement("INSERT INTO mikroerp.invoices("
+					    		+ "invoiceNumber,isOutgoing,creationDate,"
+					    		+ "expirationDate,comment,message,customerName,"
+					    		+ "shippingAddress,invoiceAddress,ust,gross,net,fkCustomerId)"
+					    		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+					//1 - 13 ?
+			  preparedStatement.setInt(1,invoice.get_invoiceNumber());
+			  preparedStatement.setInt(2,0);//fehler wsl
+			  preparedStatement.setString(3,invoice.get_creationDate());
+			  preparedStatement.setString(4,invoice.get_creationDate());
+			  preparedStatement.setString(5,invoice.get_comment());
+			  preparedStatement.setString(6,invoice.get_message());
+			  preparedStatement.setString(7,invoice.get_customerName());
+			  preparedStatement.setString(8,invoice.get_shippingAddress());
+			  preparedStatement.setString(9,invoice.get_invoiceAddress());
+			  preparedStatement.setDouble(10,invoice.get_ust());
+			  preparedStatement.setDouble(11,invoice.get_gross());
+			  preparedStatement.setDouble(12,invoice.get_net());
+			  preparedStatement.setInt(13,customerId); 						
+			
+			  preparedStatement.executeUpdate();
+			
+			  return "0";
+		}catch(SQLException e){
+			e.printStackTrace();
+			return "1";
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return "1";
+		}		
+	}
 
 	private int getIdFromName(String name) {
 		
 		try{
 			preparedStatement = connect
-			    .prepareStatement("SELECT id from CUSTOMER where name = ? OR surname = ? OR lastname = ?");
+			    .prepareStatement("SELECT id from CUSTOMER where (name = ? OR surname = ? OR lastname = ?) OR (surname = ? AND lastname = ?)");
 			
 			preparedStatement.setString(1, name);
 			preparedStatement.setString(2, name);
 			preparedStatement.setString(3, name);
+			String[] array = name.split(" ");
+			preparedStatement.setString(4, array[0]);
+			preparedStatement.setString(5, array[1]);			
 			
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
@@ -218,6 +303,16 @@ public class DataLinkLayer {
 		
 		return -1;
 	}
+	
+	@SuppressWarnings("unused")
+	private void writeMetaData(ResultSet resultSet) throws SQLException {
+	    
+	    System.out.println("The columns in the table are: ");
+	    System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
+	    for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
+	      System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
+	    }
+	}	
 	
 }
 

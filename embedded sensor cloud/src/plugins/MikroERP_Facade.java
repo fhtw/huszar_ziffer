@@ -26,7 +26,9 @@ public class MikroERP_Facade implements Plugin {
 
 	@Override
 	public String execPlugin(String[] param, List<QueryObject> query) {
-		if(param.length > 1){			
+		
+		if(param.length > 1){		
+			System.out.println(param[1]);
 			if("searchContacts".equals(param[1])){
 			
 				_customerList = new CustomerList();
@@ -42,21 +44,58 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(_customerList);
 				return xml;
-			} else if("searchInvoices".equals(param[1])){ //if no query isset all invoices in database return
-					_invoiceList = new InvoiceList();
+			}
+			if("searchInvoices".equals(param[1])){ //if no query isset all invoices in database return
+				_invoiceList = new InvoiceList();
 					
-					_invoiceList = _bl.searchInvoices(getValueFromKey(query,"name"), getDateFromKey(query,"fromDate"), getDateFromKey(query,"toDate"),
-														getDoubleFromKey(query,"fromAmount"),
-															getDoubleFromKey(query,"toAmount"));
+				_invoiceList = _bl.searchInvoices(getValueFromKey(query,"name"), getDateFromKey(query,"fromDate"), getDateFromKey(query,"toDate"),
+													getDoubleFromKey(query,"fromAmount"),
+														getDoubleFromKey(query,"toAmount"));
 					
-					XStream xs = new XStream(new StaxDriver());
-					xs.alias("Invoice", Invoice.class);
-					xs.alias("InvoiceList", InvoiceList.class);
-					xs.addImplicitCollection(InvoiceList.class, "_invoiceList");
+				XStream xs = new XStream(new StaxDriver());
+				xs.alias("Invoice", Invoice.class);
+				xs.alias("InvoiceList", InvoiceList.class);
+				xs.addImplicitCollection(InvoiceList.class, "_invoiceList");
 				    
-					// OBJECT --> XML
-					String xml = xs.toXML(_invoiceList);
-					return xml;
+				// OBJECT --> XML
+				String xml = xs.toXML(_invoiceList);
+				return xml;
+			}
+			if("createInvoice".equals(param[1])){
+				/*XStream xs = new XStream();
+				xs.alias("Invoice", Invoice.class);
+				String xml = getValueFromKey(query,"invoice");
+				Invoice invoiceToCreate = (Invoice) xs.fromXML(xml);
+				*/
+				Invoice testinvoice = new Invoice();
+				testinvoice.set_creationDate("2014-05-05");
+				testinvoice.set_comment("comment!");
+				testinvoice.set_message("message!");
+				testinvoice.set_gross(1200);
+				testinvoice.set_net(1000);
+				testinvoice.set_ust(200);
+				testinvoice.set_invoiceAddress("testaddress");
+				testinvoice.set_shippingAddress("testaddress");
+				testinvoice.set_invoiceNumber(3);
+				testinvoice.set_customerName("Stefan Ziffer");
+				testinvoice.set_isOutgoing(true);
+				return _bl.createInvoice(testinvoice);
+			}
+			if("createCustomer".equals(param[1])){
+				/*System.out.println("createCustomer");
+				XStream xs = new XStream();
+				xs.alias("Customer", Customer.class);
+				String xml = getValueFromKey(query,"customer");
+				Customer customerToCreate = (Customer) xs.fromXML(xml);
+				System.out.println("Customer-Name:"+customerToCreate.get_surname()+" "+customerToCreate.get_lastname());
+				*/
+				Customer testcustomer = new Customer();
+				testcustomer.set_uid("23456");
+				testcustomer.set_name("inserttest");
+				testcustomer.set_address("testway");
+				testcustomer.set_plz(9087);
+				testcustomer.set_city("testcity");
+				return _bl.createCustomer(testcustomer);
 			}
 		} else {		
 			String returned = null;
