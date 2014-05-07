@@ -28,7 +28,9 @@ public class MikroERP_Facade implements Plugin {
 	public String execPlugin(String[] param, List<QueryObject> query) {
 		
 		if(param.length > 1){		
+			
 			System.out.println(param[1]);
+			System.out.println(getValueFromKey(query,"surname"));
 			if("searchContacts".equals(param[1])){
 			
 				_customerList = new CustomerList();

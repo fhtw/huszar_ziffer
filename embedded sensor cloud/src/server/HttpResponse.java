@@ -30,7 +30,7 @@ public class HttpResponse {
 	public void processResponse() //write the index.html in PrintWriter and check Plugins
     {												
 		PluginManager myPluginManager = new PluginManager();
-		if(_paramArray[0] == null)
+		if(_paramArray.length < 1)
 		{
 			String buffer;    		
 			PrintWriter out;

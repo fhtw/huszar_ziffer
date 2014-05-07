@@ -52,8 +52,30 @@ public class HttpRequest implements Runnable {
 	    											//-> GET / HTTP/1.1 wäre länge 14; ab 15 steht etwas nach dem slash
 	    	{
 	    	   	param = param.substring(5, (param.length()-9));
-	    	   	_paramArray = param.split("/");
-	    	   String[] query =_paramArray[_paramArray.length - 1].split("\\?");//[0] = letzer param; [1] - [unendlich] alle queries
+	    	   	System.out.println(param);
+	    	   	String[] splitAtQuestionMark = param.split("\\?",2);
+	    	   	System.out.println("splitAtQuestionMark[0]: " + splitAtQuestionMark[0]);
+	    	   	_paramArray = splitAtQuestionMark[0].split("/");
+	    	   	if(splitAtQuestionMark.length > 1){
+	    	   		String[] splitAtAndSymbol = splitAtQuestionMark[1].split("&");
+	    	   		String[] keyValue;
+	    	   		QueryObject queryObject;
+	    	   		_queryList = new ArrayList<QueryObject>();
+	    	   		for(int i=0; i < splitAtAndSymbol.length; i++){
+		    	   		//System.out.println("Query " + i +" = " + query[i]);
+		    		   //zum ausgeben der queries
+		    	   		keyValue = splitAtAndSymbol[i].split("=",2);
+		    	   		queryObject = new QueryObject(keyValue[0],keyValue[1]);
+		    	   		_queryList.add(queryObject);
+		    	   }
+	    	   	}
+	    	}
+    	}
+	    	   	
+	    	   	
+	    	   	
+	    	   	
+	    	   /*String[] query =_paramArray[_paramArray.length - 1].split("\\?");//[0] = letzer param; [1] - [unendlich] alle queries
 	    	   _paramArray[_paramArray.length-1] = query[0];//letzten param speichern in paramArray
 	    	   if(query.length > 1){
 		    	   try{
@@ -81,7 +103,7 @@ public class HttpRequest implements Runnable {
 	    		_paramArray[0] = null;
 	    	}
 	    	
-		} 
+		} */
     	catch (IOException e) {
     		System.err.println(e);
 		}    	

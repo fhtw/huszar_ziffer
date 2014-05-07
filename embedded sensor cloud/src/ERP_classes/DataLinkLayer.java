@@ -35,7 +35,9 @@ public class DataLinkLayer {
 			    contact.set_suffix(resultSet.getString("suffix"));
 			    contact.set_surname(resultSet.getString("surname"));
 			    contact.set_lastname(resultSet.getString("lastname"));
-			    contact.set_dateOfBirth(resultSet.getDate("dateOfBirth").toString());
+			    if(resultSet.getDate("dateOfBirth") != null){
+			    	contact.set_dateOfBirth(resultSet.getDate("dateOfBirth").toString());
+			    }
 			    contact.set_employedAt(resultSet.getString("employedAt"));
 			    contact.set_address(resultSet.getString("address"));
 			    contact.set_plz(resultSet.getInt("plz"));
@@ -45,7 +47,7 @@ public class DataLinkLayer {
 		    }
 			return contacts;
 		} catch(NullPointerException e){
-			
+			e.printStackTrace();
 		}
 		return contacts;
 	}
@@ -84,7 +86,7 @@ public class DataLinkLayer {
 		    String businessname) {
 		  
 		  CustomerList contacts = new CustomerList();
-		
+		//System.out.println("surname: " + surname + " lastname: " + lastname + " businessname : " + businessname);
 		  try {
 			  // this will load the MySQL driver, each DB has its own driver
 			  Class.forName("com.mysql.jdbc.Driver");
@@ -92,28 +94,29 @@ public class DataLinkLayer {
 				    		+ "user=root&password=!eps1loN");
 			
 			  preparedStatement = connect
-					    .prepareStatement("SELECT * from CUSTOMER where (surname = ? "
-					    		+ "AND lastname = ?) "
-					    		+ "OR name = ?");
+					    .prepareStatement("SELECT * from CUSTOMER where (surname RLIKE ? "
+					    		+ "AND lastname RLIKE ?) "
+					    		+ "OR name RLIKE ?");
 			  if(surname == null){//if name was not set
-					preparedStatement.setString(1, "*");
+				  preparedStatement.setNull(1,java.sql.Types.VARCHAR);
 				}else{
 					preparedStatement.setString(1, surname);//weiß nicht wie mans besser lösen kann!!
 				}
 				if(lastname == null){//if fromDate was not set
-					preparedStatement.setString(2, "*");
+					preparedStatement.setNull(2,java.sql.Types.VARCHAR);
 				}else{
 					preparedStatement.setString(2, lastname);
 				}
 				if(businessname == null){//if toDate was not set
-					preparedStatement.setString(3,"*");
+					preparedStatement.setNull(3,java.sql.Types.VARCHAR);
 				}else{
 					preparedStatement.setString(3, businessname);
 				}
 			  
 			  resultSet = preparedStatement.executeQuery();
+			  
 			  //writeMetaData(resultSet);
-			  contacts = getContactsFromResultSet(resultSet);				
+			  return contacts = getContactsFromResultSet(resultSet);				
 		  } catch (SQLException e) {
 			  e.printStackTrace();
 		  } catch (ClassNotFoundException e) {
@@ -140,13 +143,13 @@ public class DataLinkLayer {
 			    .prepareStatement("SELECT * from INVOICES where fkCustomerId RLIKE ?"
 			    		+ " AND expirationDate BETWEEN ? AND ? "
 			    		+ "AND gross BETWEEN ? AND ?");
-			System.out.println("name: " + name);
+			/*System.out.println("name: " + name);
 			System.out.println("fromDate: " + fromDate);
 			System.out.println("toDate: " + toDate);
 			System.out.println("fromAmount: " + fromAmount);
-			System.out.println("toAmount: " + toAmount);
+			System.out.println("toAmount: " + toAmount);*/
 			 //parameters start with 1
-			System.out.println("customerId: " + customerId);
+			//System.out.println("customerId: " + customerId);
 			if(customerId <= -1){//if name was not set
 				preparedStatement.setString(1, ".*");
 			}else{
@@ -172,7 +175,7 @@ public class DataLinkLayer {
 			}else{
 				preparedStatement.setDouble(5, toAmount);
 			}
-			System.out.println(preparedStatement);
+			//System.out.println(preparedStatement);
 			//preparedStatement.setDate(6, new java.sql.Date(1990, 12, 11));
 			resultSet = preparedStatement.executeQuery();
 			
@@ -289,12 +292,19 @@ public String createInvoice(Invoice invoice) {
 			preparedStatement.setString(1, name);
 			preparedStatement.setString(2, name);
 			preparedStatement.setString(3, name);
+			preparedStatement.setString(4, name);
+			preparedStatement.setString(5, name);
+			
+			try{
 			String[] array = name.split(" ");
 			preparedStatement.setString(4, array[0]);
 			preparedStatement.setString(5, array[1]);			
-			
+			}catch(ArrayIndexOutOfBoundsException e){
+				System.out.println("getIdFromName: Name ist nicht vorname+nachname.");
+			}
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
+				System.out.println("id: " + resultSet.getInt("id"));
 			return resultSet.getInt("id");//resultSet.getInt("id");
 			}
 			}catch(SQLException e){
