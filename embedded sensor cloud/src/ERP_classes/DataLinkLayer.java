@@ -1,6 +1,7 @@
 package ERP_classes;
 
 import invoice.Invoice;
+import invoice.InvoiceElement;
 import invoice.InvoiceList;
 
 import java.sql.Connection;
@@ -8,6 +9,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
 import contacts.Customer;
 import contacts.CustomerList;
@@ -56,27 +59,78 @@ public class DataLinkLayer {
 		  // resultSet is initialised before the first data set
 			InvoiceList invoices = new InvoiceList();
 			  
-		    while (resultSet.next()) {
-			    // also possible to get the columns via the column number
-			    // which starts at 1
-			    // e.g., resultSet.getSTring(2);
-		    	Invoice invoice = new Invoice();
-		    	invoice.set_invoiceNumber(resultSet.getInt("invoiceNumber"));
-		    	invoice.set_isOutgoing(resultSet.getBoolean("isOutgoing"));
-			    invoice.set_creationDate(resultSet.getString("creationDate"));
-			    invoice.set_expirationDate(resultSet.getString("expirationDate"));
-			    invoice.set_comment(resultSet.getString("comment"));
-			    invoice.set_message(resultSet.getString("message"));
-			    invoice.set_customerName(resultSet.getString("customerName").toString());
-			    invoice.set_ust(resultSet.getInt("ust"));
-			    invoice.set_gross(resultSet.getInt("gross"));
-			    invoice.set_net(resultSet.getInt("net"));
-			    invoice.set_shippingAddress(resultSet.getString("shippingAddress"));
-			    invoice.set_invoiceAddress(resultSet.getString("invoiceAddress"));
+			try{
+				while (resultSet.next()) {
+				    // also possible to get the columns via the column number
+				    // which starts at 1
+				    // e.g., resultSet.getSTring(2);
+			    	int invoiceId = resultSet.getInt("id");
+			    	ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
+			    	Invoice invoice = new Invoice();
+			    	invoice.set_invoiceNumber(resultSet.getInt("invoiceNumber"));
+			    	invoice.set_isOutgoing(resultSet.getBoolean("isOutgoing"));
+				    invoice.set_creationDate(resultSet.getString("creationDate"));
+				    invoice.set_expirationDate(resultSet.getString("expirationDate"));
+				    invoice.set_comment(resultSet.getString("comment"));
+				    invoice.set_message(resultSet.getString("message"));
+				    invoice.set_customerName(resultSet.getString("customerName").toString());
+				    invoice.set_ust(resultSet.getInt("ust"));
+				    invoice.set_gross(resultSet.getInt("gross"));
+				    invoice.set_net(resultSet.getInt("net"));
+				    invoice.set_shippingAddress(resultSet.getString("shippingAddress"));
+				    invoice.set_invoiceAddress(resultSet.getString("invoiceAddress"));		    
 			    
-			    invoices.add(invoice);
-		    }
+					Class.forName("com.mysql.jdbc.Driver");
+					connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+					    		+ "user=root&password=!eps1loN");
+					//preparedStatements can use variables and are more efficient
+					PreparedStatement preparedStatement2 = connect
+						    .prepareStatement("SELECT * FROM INVOICES2ARTICLES "
+						    		+ "WHERE fkInvoiceId=?");
+
+					preparedStatement2.setInt(1, invoiceId);
+				
+					ResultSet resultSet2 = preparedStatement2.executeQuery();
+					while(resultSet2.next()){//has to be called!cause you need the cursor point on the id
+						InvoiceElement elem = new InvoiceElement();
+						elem.set_name(getNameFromArticle(resultSet2.getInt("fkArticleId")));
+						elem.set_amount(resultSet2.getInt("amount"));
+						elem.set_price(getPriceFromArticle(resultSet2.getInt("fkArticleId")));
+						articles.add(elem);
+					}
+					invoice.set_articles(articles);					   
+					invoices.add(invoice);
+				}
+			} catch(SQLException e){
+				e.printStackTrace();
+				return invoices;
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+				return invoices;
+			}			    
 			return invoices;
+		}
+	
+	private ArrayList<InvoiceElement> getArticlesFromResultSet(ResultSet resultSet) throws SQLException {
+		  // resultSet is initialised before the first data set
+			ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
+			  
+			try{
+				while (resultSet.next()) {
+				    // also possible to get the columns via the column number
+				    // which starts at 1
+				    // e.g., resultSet.getSTring(2);
+			    	InvoiceElement article = new InvoiceElement();
+			    	article.set_name(resultSet.getString("name"));
+			    	article.set_price(resultSet.getInt("price"));
+				  			      
+				    articles.add(article);
+			    }
+				return articles;
+			} catch(NullPointerException e){
+				e.printStackTrace();
+			}
+			return articles;
 		}
 	
 	
@@ -86,7 +140,7 @@ public class DataLinkLayer {
 		    String businessname) {
 		  
 		  CustomerList contacts = new CustomerList();
-		//System.out.println("surname: " + surname + " lastname: " + lastname + " businessname : " + businessname);
+		  System.out.println("surname: " + surname + " lastname: " + lastname + " businessname : " + businessname);
 		  try {
 			  // this will load the MySQL driver, each DB has its own driver
 			  Class.forName("com.mysql.jdbc.Driver");
@@ -97,26 +151,44 @@ public class DataLinkLayer {
 					    .prepareStatement("SELECT * from CUSTOMER where (surname RLIKE ? "
 					    		+ "AND lastname RLIKE ?) "
 					    		+ "OR name RLIKE ?");
-			  if(surname == null){//if name was not set
-				  preparedStatement.setNull(1,java.sql.Types.VARCHAR);
+			  if(!(businessname == null || businessname.equals("null") || businessname.equals(""))){
+				  preparedStatement.setString(1, " ");
+				  preparedStatement.setString(2, " ");
+				  preparedStatement.setString(3, businessname);
+				  System.out.println(preparedStatement);
+					resultSet = preparedStatement.executeQuery();
+				  
+				  //writeMetaData(resultSet);
+				  return contacts = getContactsFromResultSet(resultSet);
+			  }else {
+				  if(surname == null || surname.equals("null") || surname.equals("")){//if name was not set
+				  
+				  preparedStatement.setString(1, ".*");
 				}else{
 					preparedStatement.setString(1, surname);//weiß nicht wie mans besser lösen kann!!
 				}
-				if(lastname == null){//if fromDate was not set
-					preparedStatement.setNull(2,java.sql.Types.VARCHAR);
+			  	
+				if(lastname == null || lastname.equals("null") || lastname.equals("")){
+					preparedStatement.setString(2, ".*");
 				}else{
 					preparedStatement.setString(2, lastname);
 				}
-				if(businessname == null){//if toDate was not set
-					preparedStatement.setNull(3,java.sql.Types.VARCHAR);
+				
+				if((businessname == null || businessname.equals("null") || businessname.equals("")) && (!(lastname == null || lastname.equals("null") || lastname.equals(""))
+						|| !(surname == null || surname.equals("null") || surname.equals("")))){
+					preparedStatement.setString(3, surname + " " + lastname);
+				}else if((businessname == null || businessname.equals("null") || businessname.equals("")) && (lastname == null || lastname.equals("null") || lastname.equals(""))
+						&& (surname == null || surname.equals("null") || surname.equals(""))){					
+					preparedStatement.setString(3, ".*");
 				}else{
 					preparedStatement.setString(3, businessname);
-				}
-			  
-			  resultSet = preparedStatement.executeQuery();
+				}			  
+			  System.out.println(preparedStatement);
+				resultSet = preparedStatement.executeQuery();
 			  
 			  //writeMetaData(resultSet);
-			  return contacts = getContactsFromResultSet(resultSet);				
+			  return contacts = getContactsFromResultSet(resultSet);
+			 }		   
 		  } catch (SQLException e) {
 			  e.printStackTrace();
 		  } catch (ClassNotFoundException e) {
@@ -138,10 +210,11 @@ public class DataLinkLayer {
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 				    		+ "user=root&password=!eps1loN");
 			int customerId = getIdFromName(name);
+			System.out.println(customerId);
 			//preparedStatements can use variables and are more efficient
 			preparedStatement = connect
 			    .prepareStatement("SELECT * from INVOICES where fkCustomerId RLIKE ?"
-			    		+ " AND expirationDate BETWEEN ? AND ? "
+			    		+ " AND creationDate BETWEEN ? AND ? "
 			    		+ "AND gross BETWEEN ? AND ?");
 			/*System.out.println("name: " + name);
 			System.out.println("fromDate: " + fromDate);
@@ -156,7 +229,7 @@ public class DataLinkLayer {
 				preparedStatement.setInt(1, customerId);//weiß nicht wie mans besser lösen kann!!
 			}
 			if(fromDate == null){//if fromDate was not set
-				preparedStatement.setString(2, "*");
+				preparedStatement.setString(2, ".*");
 			}else{
 				preparedStatement.setDate(2, fromDate);
 			}
@@ -166,16 +239,16 @@ public class DataLinkLayer {
 				preparedStatement.setDate(3, toDate);
 			}
 			if(fromAmount <= -1){//if fromAmount was not set
-				preparedStatement.setString(4, "*");
+				preparedStatement.setString(4, ".*");
 			}else{
 				preparedStatement.setDouble(4, fromAmount);
 			}
 			if(toAmount <= -1){//if toAmount was not set
-				preparedStatement.setDouble(5, Double.MAX_VALUE);
+				preparedStatement.setInt(5, Integer.MAX_VALUE);
 			}else{
 				preparedStatement.setDouble(5, toAmount);
 			}
-			//System.out.println(preparedStatement);
+			System.out.println(preparedStatement);
 			//preparedStatement.setDate(6, new java.sql.Date(1990, 12, 11));
 			resultSet = preparedStatement.executeQuery();
 			
@@ -250,15 +323,20 @@ public String createInvoice(Invoice invoice) {
 				    		+ "user=root&password=!eps1loN");
 			//preparedStatements can use variables and are more efficient
 			  int customerId = getIdFromName(invoice.get_customerName());
+			  int isOutgoing = 0;
+			  int lastInsertedId = -1;
+			  if(invoice.is_isOutgoing() == true){
+				  isOutgoing = 1;
+			  }
 			  preparedStatement = connect
 					    .prepareStatement("INSERT INTO mikroerp.invoices("
 					    		+ "invoiceNumber,isOutgoing,creationDate,"
 					    		+ "expirationDate,comment,message,customerName,"
 					    		+ "shippingAddress,invoiceAddress,ust,gross,net,fkCustomerId)"
-					    		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+					    		+ "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)", Statement.RETURN_GENERATED_KEYS);
 					//1 - 13 ?
 			  preparedStatement.setInt(1,invoice.get_invoiceNumber());
-			  preparedStatement.setInt(2,0);//fehler wsl
+			  preparedStatement.setInt(2,isOutgoing);
 			  preparedStatement.setString(3,invoice.get_creationDate());
 			  preparedStatement.setString(4,invoice.get_creationDate());
 			  preparedStatement.setString(5,invoice.get_comment());
@@ -272,7 +350,28 @@ public String createInvoice(Invoice invoice) {
 			  preparedStatement.setInt(13,customerId); 						
 			
 			  preparedStatement.executeUpdate();
-			
+			  
+			  ResultSet rs = preparedStatement.getGeneratedKeys();
+              if(rs.next())
+              {
+            	  lastInsertedId = rs.getInt(1);
+              }
+			  
+			  preparedStatement = connect
+					    .prepareStatement("INSERT INTO mikroerp.invoices2articles("
+					    		+ "fkInvoiceId, fkArticleId, amount) "
+					    		+ "VALUES(?,?,?)");
+					//1 - 13 ?
+			  for(int i=0; i<invoice.get_articles().size(); i++){
+				  System.out.println("id: " + lastInsertedId);
+				  System.out.println("idFromName: " + getIdFromArticle(invoice.get_articles().get(i).get_name()));
+				  System.out.println("amount: " + invoice.get_articles().get(i).get_amount());
+				  preparedStatement.setInt(1,lastInsertedId);
+				  preparedStatement.setInt(2,getIdFromArticle(invoice.get_articles().get(i).get_name()));
+				  preparedStatement.setInt(3,invoice.get_articles().get(i).get_amount());					
+				  System.out.println(preparedStatement);
+				  preparedStatement.executeUpdate();
+			  }			
 			  return "0";
 		}catch(SQLException e){
 			e.printStackTrace();
@@ -280,7 +379,7 @@ public String createInvoice(Invoice invoice) {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 			return "1";
-		}		
+		}
 	}
 
 	private int getIdFromName(String name) {
@@ -295,22 +394,19 @@ public String createInvoice(Invoice invoice) {
 			preparedStatement.setString(4, name);
 			preparedStatement.setString(5, name);
 			
-			try{
 			String[] array = name.split(" ");
 			preparedStatement.setString(4, array[0]);
 			preparedStatement.setString(5, array[1]);			
-			}catch(ArrayIndexOutOfBoundsException e){
-				System.out.println("getIdFromName: Name ist nicht vorname+nachname.");
-			}
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
-				System.out.println("id: " + resultSet.getInt("id"));
-			return resultSet.getInt("id");//resultSet.getInt("id");
-			}
-			}catch(SQLException e){
-				e.printStackTrace();
-			}
-		
+				return resultSet.getInt("id");//resultSet.getInt("id");
+			}			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("getIdFromName: Name ist nicht vorname+nachname.");
+			return -1;
+		}	
 		return -1;
 	}
 	
@@ -322,7 +418,110 @@ public String createInvoice(Invoice invoice) {
 	    for  (int i = 1; i<= resultSet.getMetaData().getColumnCount(); i++){
 	      System.out.println("Column " +i  + " "+ resultSet.getMetaData().getColumnName(i));
 	    }
-	}	
+	}
+
+	public ArrayList<InvoiceElement> getArticles() {
+		ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+			    		+ "user=root&password=!eps1loN");
+			Statement stmt = connect.createStatement();
+			String query = "SELECT * FROM ARTICLES";
+			resultSet = stmt.executeQuery(query);
+
+			return articles = getArticlesFromResultSet(resultSet);
+		}catch(SQLException e){
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return articles;
+	}
+	
+	private int getIdFromArticle(String name) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+			    		+ "user=root&password=!eps1loN");
+			//preparedStatements can use variables and are more efficient
+			PreparedStatement preparedStatement2 = connect
+				    .prepareStatement("SELECT id FROM ARTICLES "
+				    		+ "WHERE name=?");
+
+			preparedStatement2.setString(1, name);
+		
+			resultSet = preparedStatement2.executeQuery();
+
+			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
+				return resultSet.getInt(1);
+			} else {
+				return -1;
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+			return -1;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return -1;
+		}
+	}
+	
+	private String getNameFromArticle(int id) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+			    		+ "user=root&password=!eps1loN");
+			//preparedStatements can use variables and are more efficient
+			PreparedStatement preparedStatement2 = connect
+				    .prepareStatement("SELECT id FROM ARTICLES "
+				    		+ "WHERE id=?");
+
+			preparedStatement2.setInt(1, id);
+		
+			resultSet = preparedStatement2.executeQuery();
+
+			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
+				return resultSet.getString(1);
+			} else {
+				return null;
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+			return null;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	private int getPriceFromArticle(int id) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+			    		+ "user=root&password=!eps1loN");
+			//preparedStatements can use variables and are more efficient
+			PreparedStatement preparedStatement2 = connect
+				    .prepareStatement("SELECT price FROM ARTICLES "
+				    		+ "WHERE id=?");
+
+			preparedStatement2.setInt(1, id);
+		
+			ResultSet resultSet2 = preparedStatement2.executeQuery();
+
+			if(resultSet2.next()){//has to be called!cause you need the cursor point on the id
+				return resultSet2.getInt(1);
+			} else {
+				return 0;
+			}
+		} catch(SQLException e){
+			e.printStackTrace();
+			return 0;
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
 	
 }
 

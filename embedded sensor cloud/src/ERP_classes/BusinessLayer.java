@@ -1,8 +1,10 @@
 package ERP_classes;
 
 import java.sql.Date;
+import java.util.ArrayList;
 
 import invoice.Invoice;
+import invoice.InvoiceElement;
 import invoice.InvoiceList;
 import contacts.Customer;
 import contacts.CustomerList;
@@ -40,5 +42,10 @@ public class BusinessLayer {
 		
 		return _dal.createCustomer(customer);
 		
+	}
+
+	public ArrayList<InvoiceElement> getArticles() {
+		
+		return _dal.getArticles();
 	}
 }

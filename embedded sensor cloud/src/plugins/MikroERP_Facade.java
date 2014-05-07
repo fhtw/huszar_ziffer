@@ -3,9 +3,11 @@ package plugins;
 
 import invoice.Invoice;
 import invoice.InvoiceList;
+import invoice.InvoiceElement;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import server.QueryObject;
@@ -64,40 +66,34 @@ public class MikroERP_Facade implements Plugin {
 				return xml;
 			}
 			if("createInvoice".equals(param[1])){
-				/*XStream xs = new XStream();
+				XStream xs = new XStream();
 				xs.alias("Invoice", Invoice.class);
+				xs.alias("InvoiceElement", InvoiceElement.class);
 				String xml = getValueFromKey(query,"invoice");
 				Invoice invoiceToCreate = (Invoice) xs.fromXML(xml);
-				*/
-				Invoice testinvoice = new Invoice();
-				testinvoice.set_creationDate("2014-05-05");
-				testinvoice.set_comment("comment!");
-				testinvoice.set_message("message!");
-				testinvoice.set_gross(1200);
-				testinvoice.set_net(1000);
-				testinvoice.set_ust(200);
-				testinvoice.set_invoiceAddress("testaddress");
-				testinvoice.set_shippingAddress("testaddress");
-				testinvoice.set_invoiceNumber(3);
-				testinvoice.set_customerName("Stefan Ziffer");
-				testinvoice.set_isOutgoing(true);
-				return _bl.createInvoice(testinvoice);
+
+				return _bl.createInvoice(invoiceToCreate);
 			}
 			if("createCustomer".equals(param[1])){
-				/*System.out.println("createCustomer");
+				System.out.println("createCustomer");
+				
 				XStream xs = new XStream();
 				xs.alias("Customer", Customer.class);
 				String xml = getValueFromKey(query,"customer");
 				Customer customerToCreate = (Customer) xs.fromXML(xml);
-				System.out.println("Customer-Name:"+customerToCreate.get_surname()+" "+customerToCreate.get_lastname());
-				*/
-				Customer testcustomer = new Customer();
-				testcustomer.set_uid("23456");
-				testcustomer.set_name("inserttest");
-				testcustomer.set_address("testway");
-				testcustomer.set_plz(9087);
-				testcustomer.set_city("testcity");
-				return _bl.createCustomer(testcustomer);
+
+				return _bl.createCustomer(customerToCreate);
+			}
+			if("getArticles".equals(param[1])){
+				ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
+				articles = _bl.getArticles();
+				
+				XStream xs = new XStream(new StaxDriver());
+				xs.alias("InvoiceElement", InvoiceElement.class);
+			    
+				// OBJECT --> XML
+				String xml = xs.toXML(articles);
+				return xml;
 			}
 		} else {		
 			String returned = null;
@@ -138,6 +134,8 @@ public class MikroERP_Facade implements Plugin {
         }
 		}catch(NullPointerException e){
 			return -1;
+		}catch(NumberFormatException e){
+			return -1;
 		}
 		return -1;
 	}
@@ -155,7 +153,7 @@ public class MikroERP_Facade implements Plugin {
 		}catch(NullPointerException e){
 			return null;
 		} catch (ParseException e) {
-			e.printStackTrace();
+			return null;
 		}
 		return null;
 	}
