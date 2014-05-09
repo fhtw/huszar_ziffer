@@ -5,9 +5,11 @@ public class InvoiceElement {
 	private String _name;
 	private int _amount;
 	private double _price;
+	
 	public String get_name() {
 		return _name;
 	}
+	
 	public void set_name(String _name) {
 		this._name = _name;
 	}

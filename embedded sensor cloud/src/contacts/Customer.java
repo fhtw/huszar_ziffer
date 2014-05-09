@@ -2,6 +2,7 @@ package contacts;
 
 public class Customer {
 
+	private int _id;
 	private String _uid;
 	private String _name;
 	private String _title;
@@ -14,9 +15,18 @@ public class Customer {
 	private int _plz;
 	private String _city;
 	
+	public int get_id() {
+		return _id;
+	}
+	
+	public void set_id(int _id) {
+		this._id = _id;
+	}
+	
 	public String get_uid() {
 		return _uid;
 	}
+	
 	public void set_uid(String _uid) {
 		this._uid = _uid;
 	}
