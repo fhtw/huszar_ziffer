@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Invoice {
  
+	private int _id;
 	private int _invoiceNumber;
 	private boolean _isOutgoing;
 	private String _creationDate;
@@ -18,9 +19,18 @@ public class Invoice {
 	private double _net;
 	private ArrayList<InvoiceElement> _articles;
 	
+	public int get_id() {
+		return _id;
+	}
+	
+	public void set_id(int _id) {
+		this._id = _id;
+	}
+	
 	public int get_invoiceNumber() {
 		return _invoiceNumber;
 	}
+	
 	public void set_invoiceNumber(int _invoiceNumber) {
 		this._invoiceNumber = _invoiceNumber;
 	}

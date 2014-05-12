@@ -32,6 +32,7 @@ public class DataLinkLayer {
 			    // which starts at 1
 			    // e.g., resultSet.getSTring(2);
 		    	Customer contact = new Customer();
+		    	contact.set_id(resultSet.getInt("id"));
 		    	contact.set_name(resultSet.getString("name"));
 		    	contact.set_uid(resultSet.getString("uid"));
 			    contact.set_title(resultSet.getString("title"));
@@ -67,6 +68,7 @@ public class DataLinkLayer {
 			    	int invoiceId = resultSet.getInt("id");
 			    	ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
 			    	Invoice invoice = new Invoice();
+			    	invoice.set_id(resultSet.getInt("id"));
 			    	invoice.set_invoiceNumber(resultSet.getInt("invoiceNumber"));
 			    	invoice.set_isOutgoing(resultSet.getBoolean("isOutgoing"));
 				    invoice.set_creationDate(resultSet.getString("creationDate"));
@@ -74,12 +76,13 @@ public class DataLinkLayer {
 				    invoice.set_comment(resultSet.getString("comment"));
 				    invoice.set_message(resultSet.getString("message"));
 				    invoice.set_customerName(resultSet.getString("customerName").toString());
-				    invoice.set_ust(resultSet.getInt("ust"));
-				    invoice.set_gross(resultSet.getInt("gross"));
-				    invoice.set_net(resultSet.getInt("net"));
+				    invoice.set_ust(resultSet.getDouble("ust"));
+				    invoice.set_gross(resultSet.getDouble("gross"));
+				    invoice.set_net(resultSet.getDouble("net"));
 				    invoice.set_shippingAddress(resultSet.getString("shippingAddress"));
 				    invoice.set_invoiceAddress(resultSet.getString("invoiceAddress"));		    
-			    
+				    
+				    // get invoice articles from db
 					Class.forName("com.mysql.jdbc.Driver");
 					connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 					    		+ "user=root&password=!eps1loN");
@@ -122,7 +125,7 @@ public class DataLinkLayer {
 				    // e.g., resultSet.getSTring(2);
 			    	InvoiceElement article = new InvoiceElement();
 			    	article.set_name(resultSet.getString("name"));
-			    	article.set_price(resultSet.getInt("price"));
+			    	article.set_price(resultSet.getDouble("price"));
 				  			      
 				    articles.add(article);
 			    }
@@ -265,7 +268,9 @@ public class DataLinkLayer {
 	}
 	
 	public String createCustomer(Customer customer) {
-		
+		if(customer.get_id() > 0){
+			return updateCustomer(customer);
+		}
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
@@ -301,9 +306,7 @@ public class DataLinkLayer {
 				  preparedStatement.setString(9,customer.get_address());
 				  preparedStatement.setInt(10,customer.get_plz());
 				  preparedStatement.setString(11,customer.get_city()); 
-			  }
-						
-			
+			  }			
 			preparedStatement.executeUpdate();
 			return "0";
 			
@@ -317,7 +320,57 @@ public class DataLinkLayer {
 		
 	}
 	
-public String createInvoice(Invoice invoice) {
+	private String updateCustomer(Customer customer) {
+		try{
+			Class.forName("com.mysql.jdbc.Driver");
+			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
+			    		+ "user=root&password=!eps1loN");
+		//preparedStatements can use variables and are more efficient
+		  preparedStatement = connect
+				    .prepareStatement("UPDATE mikroerp.customer "
+				    + "SET uid=?, name=?, title=?, suffix=?, surname=?, lastname=?, "
+				    + "dateOfBirth=?, employedAt=?, address=?, plz=?, city=? "
+				    + "WHERE id=?");
+				//1 - 11 ?
+		  if(customer.get_lastname() == null){//if it is a business
+			  preparedStatement.setString(1,customer.get_uid());
+			  preparedStatement.setString(2,customer.get_name());
+			  preparedStatement.setNull(3,java.sql.Types.VARCHAR);
+			  preparedStatement.setNull(4,java.sql.Types.VARCHAR);
+			  preparedStatement.setNull(5,java.sql.Types.VARCHAR);
+			  preparedStatement.setNull(6,java.sql.Types.VARCHAR);
+			  preparedStatement.setNull(7,java.sql.Types.VARCHAR);
+			  preparedStatement.setNull(8,java.sql.Types.VARCHAR);
+			  preparedStatement.setString(9,customer.get_address());
+			  preparedStatement.setInt(10,customer.get_plz());
+			  preparedStatement.setString(11,customer.get_city());
+			  preparedStatement.setInt(12, customer.get_id());
+		  }else{//if it is a person
+			  preparedStatement.setNull(1,java.sql.Types.INTEGER);
+			  preparedStatement.setNull(2,java.sql.Types.VARCHAR);
+			  preparedStatement.setString(3,customer.get_title());
+			  preparedStatement.setString(4,customer.get_suffix());
+			  preparedStatement.setString(5,customer.get_surname());
+			  preparedStatement.setString(6,customer.get_lastname());
+			  preparedStatement.setString(7,customer.get_dateOfBirth());
+			  preparedStatement.setString(8,customer.get_employedAt());
+			  preparedStatement.setString(9,customer.get_address());
+			  preparedStatement.setInt(10,customer.get_plz());
+			  preparedStatement.setString(11,customer.get_city());
+			  preparedStatement.setInt(12, customer.get_id());
+		  }	
+		  preparedStatement.executeUpdate();
+		  return "0";
+		} catch(SQLException e){
+			e.printStackTrace();
+			return "1";
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			return "1";
+		}
+	}
+	
+	public String createInvoice(Invoice invoice) {
 		
 		try{ 
 			Class.forName("com.mysql.jdbc.Driver");
@@ -500,7 +553,7 @@ public String createInvoice(Invoice invoice) {
 		}
 	}
 	
-	private int getPriceFromArticle(int id) {
+	private double getPriceFromArticle(int id) {
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
@@ -515,7 +568,7 @@ public String createInvoice(Invoice invoice) {
 			ResultSet resultSet2 = preparedStatement2.executeQuery();
 
 			if(resultSet2.next()){//has to be called!cause you need the cursor point on the id
-				return resultSet2.getInt(1);
+				return resultSet2.getDouble(1);
 			} else {
 				return 0;
 			}
