@@ -222,9 +222,11 @@ public class DataLinkLayer {
 			System.out.println("fromAmount: " + fromAmount);
 			System.out.println("toAmount: " + toAmount);*/
 			 //parameters start with 1
-			//System.out.println("customerId: " + customerId);
+			System.out.println("customerId: " + customerId);
 			if(customerId <= -1){//if name was not set
 				preparedStatement.setString(1, ".*");
+			}else if(customerId == 0){//if name was not set
+				preparedStatement.setString(1, " ");
 			}else{
 				preparedStatement.setInt(1, customerId);//weiß nicht wie mans besser lösen kann!!
 			}
@@ -385,6 +387,9 @@ public String createInvoice(Invoice invoice) {
 	private int getIdFromName(String name) {
 		
 		try{
+			if(name == null || "".equals(name)){
+				return -1;
+			}
 			preparedStatement = connect
 			    .prepareStatement("SELECT id from CUSTOMER where (name = ? OR surname = ? OR lastname = ?) OR (surname = ? AND lastname = ?)");
 			
@@ -400,12 +405,12 @@ public String createInvoice(Invoice invoice) {
 			resultSet = preparedStatement.executeQuery();
 			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
 				return resultSet.getInt("id");//resultSet.getInt("id");
-			}			
+			}
 		}catch(SQLException e){
 			e.printStackTrace();
 		}catch(ArrayIndexOutOfBoundsException e){
 			System.out.println("getIdFromName: Name ist nicht vorname+nachname.");
-			return -1;
+			return 0;
 		}	
 		return -1;
 	}

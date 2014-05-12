@@ -1,2 +1,6 @@
-/plugins
 /ERP_classes
+/Exceptions
+/contacts
+/invoice
+/plugins
+/unittests
