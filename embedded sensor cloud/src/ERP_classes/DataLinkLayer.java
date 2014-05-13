@@ -56,31 +56,31 @@ public class DataLinkLayer {
 		return contacts;
 	}
 	
-	private InvoiceList getInvoicesFromResultSet(ResultSet resultSet) throws SQLException {
+	private ArrayList<Invoice> getInvoicesFromResultSet(ResultSet set) throws SQLException {
 		  // resultSet is initialised before the first data set
-			InvoiceList invoices = new InvoiceList();
+			ArrayList<Invoice> invoices = new ArrayList<Invoice>();
 			  
 			try{
-				while (resultSet.next()) {
+				while (set.next()) {
 				    // also possible to get the columns via the column number
 				    // which starts at 1
 				    // e.g., resultSet.getSTring(2);
-			    	int invoiceId = resultSet.getInt("id");
+			    	int invoiceId = set.getInt("id");
 			    	ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
 			    	Invoice invoice = new Invoice();
-			    	invoice.set_id(resultSet.getInt("id"));
-			    	invoice.set_invoiceNumber(resultSet.getInt("invoiceNumber"));
-			    	invoice.set_isOutgoing(resultSet.getBoolean("isOutgoing"));
-				    invoice.set_creationDate(resultSet.getString("creationDate"));
-				    invoice.set_expirationDate(resultSet.getString("expirationDate"));
-				    invoice.set_comment(resultSet.getString("comment"));
-				    invoice.set_message(resultSet.getString("message"));
-				    invoice.set_customerName(resultSet.getString("customerName").toString());
-				    invoice.set_ust(resultSet.getDouble("ust"));
-				    invoice.set_gross(resultSet.getDouble("gross"));
-				    invoice.set_net(resultSet.getDouble("net"));
-				    invoice.set_shippingAddress(resultSet.getString("shippingAddress"));
-				    invoice.set_invoiceAddress(resultSet.getString("invoiceAddress"));		    
+			    	invoice.set_id(set.getInt("id"));
+			    	invoice.set_invoiceNumber(set.getInt("invoiceNumber"));
+			    	invoice.set_isOutgoing(set.getBoolean("isOutgoing"));
+				    invoice.set_creationDate(set.getString("creationDate"));
+				    invoice.set_expirationDate(set.getString("expirationDate"));
+				    invoice.set_comment(set.getString("comment"));
+				    invoice.set_message(set.getString("message"));
+				    invoice.set_customerName(set.getString("customerName").toString());
+				    invoice.set_ust(set.getDouble("ust"));
+				    invoice.set_gross(set.getDouble("gross"));
+				    invoice.set_net(set.getDouble("net"));
+				    invoice.set_shippingAddress(set.getString("shippingAddress"));
+				    invoice.set_invoiceAddress(set.getString("invoiceAddress"));		    
 				    
 				    // get invoice articles from db
 					Class.forName("com.mysql.jdbc.Driver");
@@ -104,6 +104,7 @@ public class DataLinkLayer {
 					invoice.set_articles(articles);					   
 					invoices.add(invoice);
 				}
+				return invoices;
 			} catch(SQLException e){
 				e.printStackTrace();
 				return invoices;
@@ -111,7 +112,6 @@ public class DataLinkLayer {
 				e.printStackTrace();
 				return invoices;
 			}			    
-			return invoices;
 		}
 	
 	private ArrayList<InvoiceElement> getArticlesFromResultSet(ResultSet resultSet) throws SQLException {
@@ -206,14 +206,13 @@ public class DataLinkLayer {
 			double fromAmount,
 			double toAmount){
 		
-		InvoiceList invoices = new InvoiceList();
+		InvoiceList result = new InvoiceList();
 		
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 				    		+ "user=root&password=!eps1loN");
-			int customerId = getIdFromName(name);
-			System.out.println(customerId);
+			ArrayList<Integer> customerIds = getIdFromName(name);
 			//preparedStatements can use variables and are more efficient
 			preparedStatement = connect
 			    .prepareStatement("SELECT * from INVOICES where fkCustomerId RLIKE ?"
@@ -225,45 +224,51 @@ public class DataLinkLayer {
 			System.out.println("fromAmount: " + fromAmount);
 			System.out.println("toAmount: " + toAmount);*/
 			 //parameters start with 1
-			System.out.println("customerId: " + customerId);
-			if(customerId <= -1){//if name was not set
-				preparedStatement.setString(1, ".*");
-			}else if(customerId == 0){//if name was not set
-				preparedStatement.setString(1, " ");
-			}else{
-				preparedStatement.setInt(1, customerId);//weiß nicht wie mans besser lösen kann!!
+			for(int i=0; i<customerIds.size(); i++){
+				if(customerIds.get(i) <= 0){//if name was not set
+					preparedStatement.setString(1, ".*");
+				}else{
+					preparedStatement.setInt(1, customerIds.get(i));
+				}
+				if(fromDate == null){//if fromDate was not set
+					preparedStatement.setString(2, ".*");
+				}else{
+					preparedStatement.setDate(2, fromDate);
+				}
+				if(toDate == null){//if toDate was not set
+					preparedStatement.setString(3,"3000-01-01");
+				}else{
+					preparedStatement.setDate(3, toDate);
+				}
+				if(fromAmount <= -1){//if fromAmount was not set
+					preparedStatement.setString(4, ".*");
+				}else{
+					preparedStatement.setDouble(4, fromAmount);
+				}
+				if(toAmount <= -1){//if toAmount was not set
+					preparedStatement.setInt(5, Integer.MAX_VALUE);
+				}else{
+					preparedStatement.setDouble(5, toAmount);
+				}
+				System.out.println(preparedStatement);
+				//preparedStatement.setDate(6, new java.sql.Date(1990, 12, 11));
+				ResultSet resultSet = preparedStatement.executeQuery();
+				if(resultSet != null){
+					ArrayList<Invoice> invoiceList = new ArrayList<Invoice>();
+					invoiceList = getInvoicesFromResultSet(resultSet);
+					for(int y=0; y<invoiceList.size(); y++){
+						result.add(invoiceList.get(y));
+					}	
+				}
 			}
-			if(fromDate == null){//if fromDate was not set
-				preparedStatement.setString(2, ".*");
-			}else{
-				preparedStatement.setDate(2, fromDate);
-			}
-			if(toDate == null){//if toDate was not set
-				preparedStatement.setString(3,"3000-01-01");
-			}else{
-				preparedStatement.setDate(3, toDate);
-			}
-			if(fromAmount <= -1){//if fromAmount was not set
-				preparedStatement.setString(4, ".*");
-			}else{
-				preparedStatement.setDouble(4, fromAmount);
-			}
-			if(toAmount <= -1){//if toAmount was not set
-				preparedStatement.setInt(5, Integer.MAX_VALUE);
-			}else{
-				preparedStatement.setDouble(5, toAmount);
-			}
-			System.out.println(preparedStatement);
-			//preparedStatement.setDate(6, new java.sql.Date(1990, 12, 11));
-			resultSet = preparedStatement.executeQuery();
-			
-			return invoices = getInvoicesFromResultSet(resultSet);
+			System.out.println(result.getInvoices().size());
+			return result;
 		}catch(SQLException e){
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
-		return invoices;
+		return result;
 		
 	}
 	
@@ -377,7 +382,7 @@ public class DataLinkLayer {
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 				    		+ "user=root&password=!eps1loN");
 			//preparedStatements can use variables and are more efficient
-			  int customerId = getIdFromName(invoice.get_customerName());
+			  int customerId = getIdFromName(invoice.get_customerName()).get(0);
 			  int isOutgoing = 0;
 			  int lastInsertedId = -1;
 			  if(invoice.is_isOutgoing() == true){
@@ -437,14 +442,15 @@ public class DataLinkLayer {
 		}
 	}
 
-	private int getIdFromName(String name) {
-		
+	private ArrayList<Integer> getIdFromName(String name) {
+		ArrayList<Integer> result = new ArrayList<Integer>();
 		try{
 			if(name == null || "".equals(name)){
-				return -1;
+				result.add(-1);
+				return result;
 			}
 			preparedStatement = connect
-			    .prepareStatement("SELECT id from CUSTOMER where (name = ? OR surname = ? OR lastname = ?) OR (surname = ? AND lastname = ?)");
+			    .prepareStatement("SELECT id from CUSTOMER where (name RLIKE ? OR surname RLIKE ? OR lastname RLIKE ?) OR (surname RLIKE ? AND lastname RLIKE ?)");
 			
 			preparedStatement.setString(1, name);
 			preparedStatement.setString(2, name);
@@ -453,19 +459,28 @@ public class DataLinkLayer {
 			preparedStatement.setString(5, name);
 			
 			String[] array = name.split(" ");
-			preparedStatement.setString(4, array[0]);
-			preparedStatement.setString(5, array[1]);			
-			resultSet = preparedStatement.executeQuery();
-			if(resultSet.next()){//has to be called!cause you need the cursor point on the id
-				return resultSet.getInt("id");//resultSet.getInt("id");
+			if(array.length >= 2){
+				preparedStatement.setString(4, array[0]);
+				preparedStatement.setString(5, array[1]);
+			} else {
+				preparedStatement.setString(4, name);
+				preparedStatement.setString(5, name);
 			}
+			System.out.println(preparedStatement);
+			resultSet = preparedStatement.executeQuery();
+			while(resultSet.next()){//has to be called!cause you need the cursor point on the id
+				result.add(resultSet.getInt("id"));
+			}
+			return result;
 		}catch(SQLException e){
 			e.printStackTrace();
+			result.add(-1);
+			return result;
 		}catch(ArrayIndexOutOfBoundsException e){
 			System.out.println("getIdFromName: Name ist nicht vorname+nachname.");
-			return 0;
+			result.add(-1);
+			return result;
 		}	
-		return -1;
 	}
 	
 	@SuppressWarnings("unused")
@@ -579,8 +594,7 @@ public class DataLinkLayer {
 			e.printStackTrace();
 			return 0;
 		}
-	}
-	
+	}	
 }
 
 /*insert into  CUSTOMER values (default, ?, ?, ?, ? , ?, ?, ?, ?, ?, ?)");
