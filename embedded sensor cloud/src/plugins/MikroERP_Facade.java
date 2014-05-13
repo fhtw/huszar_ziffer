@@ -1,6 +1,7 @@
 package plugins;
 
 
+import invoice.CalculatedValues;
 import invoice.Invoice;
 import invoice.InvoiceList;
 import invoice.InvoiceElement;
@@ -48,7 +49,7 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(_customerList);
 				return xml;
-			}
+			} else
 			if("searchInvoices".equals(param[1])){ //if no query isset all invoices in database return
 				_invoiceList = new InvoiceList();
 					
@@ -64,7 +65,7 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(_invoiceList);
 				return xml;
-			}
+			} else
 			if("createInvoice".equals(param[1])){
 				XStream xs = new XStream();
 				xs.alias("Invoice", Invoice.class);
@@ -73,7 +74,7 @@ public class MikroERP_Facade implements Plugin {
 				Invoice invoiceToCreate = (Invoice) xs.fromXML(xml);
 
 				return _bl.createInvoice(invoiceToCreate);
-			}
+			} else
 			if("createCustomer".equals(param[1])){
 				System.out.println("createCustomer");
 				
@@ -83,7 +84,7 @@ public class MikroERP_Facade implements Plugin {
 				Customer customerToCreate = (Customer) xs.fromXML(xml);
 
 				return _bl.createCustomer(customerToCreate);
-			}
+			} else
 			if("getArticles".equals(param[1])){
 				ArrayList<InvoiceElement> articles = new ArrayList<InvoiceElement>();
 				articles = _bl.getArticles();
@@ -94,7 +95,20 @@ public class MikroERP_Facade implements Plugin {
 				// OBJECT --> XML
 				String xml = xs.toXML(articles);
 				return xml;
+			} else
+			if("calculateValue".equals(param[1])){
+				XStream xs = new XStream();
+				String xml = getValueFromKey(query,"calculate");
+				@SuppressWarnings("unchecked")
+				ArrayList<Double> prices = (ArrayList<Double>) xs.fromXML(xml);
+
+				xs.alias("CalculatedValues", CalculatedValues.class);
+			    
+				// OBJECT --> XML
+				String repsonseXML = xs.toXML(_bl.calculateValue(prices));
+				return repsonseXML;
 			}
+			
 		} else {		
 			String returned = null;
 			if(query == null){

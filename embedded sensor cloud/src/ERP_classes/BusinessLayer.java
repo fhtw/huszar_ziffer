@@ -3,6 +3,7 @@ package ERP_classes;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import invoice.CalculatedValues;
 import invoice.Invoice;
 import invoice.InvoiceElement;
 import invoice.InvoiceList;
@@ -33,9 +34,24 @@ public class BusinessLayer {
 	}
 
 	public String createInvoice(Invoice invoice) {
+		/* calculate net, ust and total for new invoice */
+		double net = 0;
+		double ust = 0;
+		double total = 0;
 		
-		return _dal.createInvoice(invoice);
+		for(int i=0; i<invoice.get_articles().size(); i++){
+			double price = invoice.get_articles().get(i).get_price();
+			int amount = invoice.get_articles().get(i).get_amount();
+			net += (price * amount) / 120 * 100;
+			ust += (price * amount) / 120 * 20;
+			total += price * amount;
+		}
 		
+		invoice.set_net(net);
+		invoice.set_ust(ust);
+		invoice.set_gross(total);
+		
+		return _dal.createInvoice(invoice);		
 	}
 	
 	public String createCustomer(Customer customer) {
@@ -47,5 +63,29 @@ public class BusinessLayer {
 	public ArrayList<InvoiceElement> getArticles() {
 		
 		return _dal.getArticles();
+	}
+	
+	public CalculatedValues calculateValue(ArrayList<Double> prices) {
+		CalculatedValues values = new CalculatedValues();
+		double net = 0;
+		double ust = 0;
+		double total = 0;
+		/* calculate net, ust and total for new invoice */		
+		for(int i=0; i<prices.size(); i++){
+			double price = prices.get(i);
+			
+			net += price / 120 * 100;
+			ust += price / 120 * 20;
+			total += price;
+			
+		}
+		
+		values.set_net(net);
+		values.set_ust(ust);
+		values.set_gross(total);	
+		System.out.println(values.get_net());
+		System.out.println(values.get_ust());
+		System.out.println(values.get_gross());
+		return values;
 	}
 }
