@@ -547,7 +547,7 @@ public class DataLinkLayer {
 			    		+ "user=root&password=!eps1loN");
 			//preparedStatements can use variables and are more efficient
 			PreparedStatement preparedStatement2 = connect
-				    .prepareStatement("SELECT id FROM ARTICLES "
+				    .prepareStatement("SELECT name FROM ARTICLES "
 				    		+ "WHERE id=?");
 
 			preparedStatement2.setInt(1, id);

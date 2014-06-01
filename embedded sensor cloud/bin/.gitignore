@@ -5,3 +5,5 @@
 /plugins
 /server
 /unittests
+/DAL
+/Facade

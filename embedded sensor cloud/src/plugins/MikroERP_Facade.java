@@ -33,8 +33,7 @@ public class MikroERP_Facade implements Plugin {
 		if(param.length > 1){		
 			
 			System.out.println(param[1]);
-			System.out.println(getValueFromKey(query,"surname"));
-			if("searchContacts".equals(param[1])){
+			System.out.println(getValueFromKey(query,"surname"));			if("searchContacts".equals(param[1])){
 			
 				_customerList = new CustomerList();
 				_customerList = _bl.searchContacts(getValueFromKey(query,"surname"),
@@ -126,14 +125,14 @@ public class MikroERP_Facade implements Plugin {
 	}
 		
 
-	private String getValueFromKey(List<QueryObject> query,String key){
+	private String getValueFromKey(List<QueryObject> query, String key){
 		try{
-		for(QueryObject q : query) {
-            if(key.equals(q.get_key())){
-            	return q.get_value();//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
-            }
-        }
-		}catch(NullPointerException e){
+			for(QueryObject q : query) {
+	            if(key.equals(q.get_key())){
+	            	return q.get_value();//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
+	            }
+			}
+        }catch(NullPointerException e){
 			return null;
 		}
 		return null;
@@ -141,11 +140,11 @@ public class MikroERP_Facade implements Plugin {
 	
 	private double getDoubleFromKey(List<QueryObject> query,String key){
 		try{
-		for(QueryObject q : query) {
-            if(key.equals(q.get_key())){
-            	return Double.parseDouble(q.get_value());//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
-            }
-        }
+			for(QueryObject q : query) {
+	            if(key.equals(q.get_key())){
+	            	return Double.parseDouble(q.get_value());//gibt nur den erste value zurück den er findet, da wir vorraussetzen dass es keine doppelten namen gibt
+	            }
+	        }
 		}catch(NullPointerException e){
 			return -1;
 		}catch(NumberFormatException e){
@@ -156,14 +155,14 @@ public class MikroERP_Facade implements Plugin {
 	
 	private java.sql.Date getDateFromKey(List<QueryObject> query,String key){
 		try{
-		for(QueryObject q : query) {
-            if(key.equals(q.get_key())){
-            	SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
-    			java.util.Date utilDate = simpleDate.parse(q.get_value());
-    			java.sql.Date date = new java.sql.Date(utilDate.getTime());
-            	return date;
-            }
-        }
+			for(QueryObject q : query) {
+	            if(key.equals(q.get_key())){
+	            	SimpleDateFormat simpleDate = new SimpleDateFormat("yyyy-MM-dd");
+	    			java.util.Date utilDate = simpleDate.parse(q.get_value());
+	    			java.sql.Date date = new java.sql.Date(utilDate.getTime());
+	            	return date;
+	            }
+	        }
 		}catch(NullPointerException e){
 			return null;
 		} catch (ParseException e) {

@@ -3,6 +3,7 @@ package ERP_classes;
 import java.sql.Date;
 import java.util.ArrayList;
 
+import unittests.FakeDAL;
 import invoice.CalculatedValues;
 import invoice.Invoice;
 import invoice.InvoiceElement;
@@ -14,6 +15,7 @@ import contacts.CustomerList;
 public class BusinessLayer {
 	
 	DataLinkLayer _dal = new DataLinkLayer();
+	FakeDAL _fdal = new FakeDAL();
 	CustomerList _contacts = null;
 	InvoiceList _invoices = null;
 
