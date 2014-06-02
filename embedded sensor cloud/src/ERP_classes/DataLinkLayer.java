@@ -162,8 +162,11 @@ public class DataLinkLayer {
 					resultSet = preparedStatement.executeQuery();
 				  
 				  //writeMetaData(resultSet);
-				  return contacts = getContactsFromResultSet(resultSet);
-			  }else {
+					if((surname == null || surname.equals("null") || surname.equals(""))
+							&& (lastname == null || lastname.equals("null") || lastname.equals(""))){
+						return contacts = getContactsFromResultSet(resultSet);
+					}
+			  }
 				  if(surname == null || surname.equals("null") || surname.equals("")){//if name was not set
 				  
 				  preparedStatement.setString(1, ".*");
@@ -190,8 +193,9 @@ public class DataLinkLayer {
 				resultSet = preparedStatement.executeQuery();
 			  
 			  //writeMetaData(resultSet);
-			  return contacts = getContactsFromResultSet(resultSet);
-			 }		   
+				
+				return contacts = getContactsFromResultSet(resultSet);
+				
 		  } catch (SQLException e) {
 			  e.printStackTrace();
 		  } catch (ClassNotFoundException e) {
@@ -540,7 +544,7 @@ public class DataLinkLayer {
 		}
 	}
 	
-	private String getNameFromArticle(int id) {
+	private String getNameFromArticle(Integer id) {
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
@@ -568,7 +572,7 @@ public class DataLinkLayer {
 		}
 	}
 	
-	private double getPriceFromArticle(int id) {
+	private double getPriceFromArticle(Integer id) {
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
 			connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
