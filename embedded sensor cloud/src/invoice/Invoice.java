@@ -6,7 +6,8 @@ public class Invoice {
  
 	private int _id;
 	private int _invoiceNumber;
-	private boolean _isOutgoing;
+	private int _customerId;
+    private boolean _isOutgoing;
 	private String _creationDate;
 	private String _expirationDate;
 	private String _comment;
@@ -34,6 +35,14 @@ public class Invoice {
 	public void set_invoiceNumber(int _invoiceNumber) {
 		this._invoiceNumber = _invoiceNumber;
 	}
+	
+	public int get_customerId() {
+        return _customerId;
+    }
+
+    public void set_customerId(int _customerId) {
+        this._customerId = _customerId;
+    }
 	
 	public boolean is_isOutgoing() {
 		return _isOutgoing;

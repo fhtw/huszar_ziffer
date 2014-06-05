@@ -386,7 +386,6 @@ public class DataLinkLayer {
 			  connect = DriverManager.getConnection("jdbc:mysql://localhost/mikroerp?"
 				    		+ "user=root&password=!eps1loN");
 			//preparedStatements can use variables and are more efficient
-			  int customerId = getIdFromName(invoice.get_customerName()).get(0);
 			  int isOutgoing = 0;
 			  int lastInsertedId = -1;
 			  if(invoice.is_isOutgoing() == true){
@@ -411,7 +410,7 @@ public class DataLinkLayer {
 			  preparedStatement.setDouble(10,invoice.get_ust());
 			  preparedStatement.setDouble(11,invoice.get_gross());
 			  preparedStatement.setDouble(12,invoice.get_net());
-			  preparedStatement.setInt(13,customerId); 						
+			  preparedStatement.setInt(13,invoice.get_customerId()); 						
 			
 			  preparedStatement.executeUpdate();
 			  
